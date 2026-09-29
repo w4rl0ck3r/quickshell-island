@@ -3,32 +3,44 @@ import QtQuick
 import Quickshell.Io
 
 // Aproximação de "tempo de tela" usando o uptime do sistema.
-// Não existe uma API padrão de screen-time no Linux/Wayland; se você usar
-// um tracker próprio (ex: script que soma tempo de sessão ativa em um
-// arquivo), troque o comando abaixo para ler esse arquivo.
 QtObject {
     id: root
-    property int seconds: 0
-    readonly property string formatted: {
-        const h = Math.floor(root.seconds / 3600)
-        const m = Math.floor((root.seconds % 3600) / 60)
-        return (h > 0 ? (h + "h ") : "") + m + "m"
-    }
 
-    property Process proc: Process {
-        command: ["sh", "-c", "cut -d. -f1 /proc/uptime"]
-        stdout: SplitParser {
-            onRead: data => {
-                const v = parseInt(data)
-                if (!isNaN(v)) root.seconds = v
-            }
-        }
+    property int seconds: 0
+    property string formatted: "0m"
+
+    property FileView uptimeFile: FileView {
+        path: "/proc/uptime"
+        onLoaded: root._parseUptime()
     }
 
     property Connections _heartbeat: Connections {
         target: Heartbeat
         function onTick60s() {
-            proc.running = true
+            root.uptimeFile.reload()
+        }
+    }
+
+    function _parseUptime() {
+        const text = uptimeFile.text()
+        if (!text) return
+
+        const spaceIdx = text.indexOf(" ")
+        const dotIdx = text.indexOf(".")
+
+        let endIdx = text.length
+        if (dotIdx !== -1 && dotIdx < endIdx) endIdx =  dotIdx
+        if (spaceIdx !== -1 && spaceIdx < endIdx) endIdx = spaceIdx
+
+        const secs = parseInt(text.substring(0, endIdx), 10)
+
+        if (!isNaN(secs) && secs !== root.seconds) {
+            root.seconds = secs
+
+            const h = Math.floor(secs / 3600)
+            const m = Math.floor((secs % 3600) / 60)
+
+            root.formatted = (h > 0 ? (h + "h ") : "") + m + "m"
         }
     }
 }
