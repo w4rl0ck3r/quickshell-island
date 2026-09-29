@@ -30,22 +30,13 @@ QtObject {
         path: root.hwmonGpuPath + "/temp1_input"
     }
 
-    property Timer timer: Timer {
-        interval: 4000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.cpuTempFile.reload()
+    property Connections _heartbeat: Connections {
+        target: Heartbeat
+        function onTick3s() {
+            root.cpuTempFile.reload()
+            root.gpuTempFile.reload()
+        }
     }
-
-    property Timer timer2: Timer {
-        interval: 4000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.gpuTempFile.reload()
-    }
-
 }
 
 // /hwmon2/name:BAT0

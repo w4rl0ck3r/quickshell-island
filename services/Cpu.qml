@@ -14,6 +14,13 @@ QtObject {
         path: "/proc/stat"
     }
 
+    property Connections _heartbeat: Connections {
+        target: Heartbeat
+        function onTick3s() {
+            root.statFile.reload()
+        }
+    }
+
     property var sample: {
         const line  = root.statFile.text().split("\n")[0]
         const parts = line.trim().split(/\s+/).slice(1).map(Number)
@@ -30,11 +37,4 @@ QtObject {
         root._prevTotal = sample.total
     }
 
-    property Timer timer: Timer {
-        interval: 2000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.statFile.reload()
-    }
 }

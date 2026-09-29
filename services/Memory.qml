@@ -15,18 +15,17 @@ QtObject {
     property int _totalKb: 0
     property int _usedKb: 0
 
+    property Connections _heartbeat: Connections {
+        target: Heartbeat 
+        function onTick3s() {
+            root.memFile.reload()
+        }
+    }
+
     property FileView memFile: FileView {
         path: "/proc/meminfo"
         // Processa o arquivo sem bindings
         onLoaded: root._parseMeminfo()
-    }
-
-    property Timer timer: Timer {
-        interval: 3000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.memFile.reload()
     }
 
     // Função leve: faz busca simples sem regex ou alocações

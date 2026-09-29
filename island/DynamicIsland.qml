@@ -40,13 +40,39 @@ Item {
         Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
 
         Text {
+            id: clockText
             visible: !root.showingNotif && ! root.showingCalendar
             anchors.centerIn: parent
-            text: Qt.formatTime(clock.date, "HH:mm")
             color: Theme.islandText
             font.family: Theme.fontFamily
             font.bold: true
             font.pixelSize: Theme.fontSize
+            text: clock.timeString
+
+            property Connections _heartbeat: Connections {
+                target: Heartbeat
+                function onTick1s() {
+                    clock.updateTime()
+                }
+            }
+        }
+
+        QtObject {
+            id: clock
+
+            property string timeString: Qt.formatTime(new Date(), "HH:mm")
+
+            property int _lastMinute: -1
+
+            function updateTime() {
+                const now = new Date()
+                const currentMinute = now.getMinutes()
+
+                if (currentMinute !== clock._lastMinute) {
+                    clock._lastMinute = currentMinute
+                    clock.timeString = Qt.formatTime(now, "HH:mm")
+                }
+            }
         }
 
         CalendarView {
@@ -62,18 +88,6 @@ Item {
             notification: Notifications.current
             opacity: root.showingNotif ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Theme.animNormal } }
-        }
-
-        QtObject {
-            id: clock
-            property var date: new Date()
-        }
-
-        Timer {
-            interval: 25000
-            running: true
-            repeat: true
-            onTriggered: clock.date = new Date()
         }
 
         Timer {

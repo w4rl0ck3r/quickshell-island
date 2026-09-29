@@ -25,11 +25,10 @@ QtObject {
         }
     }
 
-    property Timer timer: Timer {
-        interval: 30000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: proc.running = true
+    property Connections _heartbeat: Connections {
+        target: Heartbeat
+        function onTick60s() {
+            proc.running = true
+        }
     }
 }
