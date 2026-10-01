@@ -34,11 +34,11 @@ Item {
             component: notificationMode
         },
         {
-            name: "calendar",
+            nname: "central",
             active: root.hovering,
-            width: Config.islandExpandedWidth,
-            height: Config.islandExpandedHeight,
-            component: calendarMode
+            width: Config.islandCentralWidth,
+            height: Config.islandCentralHeight,
+            component: centralMode
         },
         {
             name: "clock",
@@ -50,6 +50,21 @@ Item {
     ]
 
     readonly property var mode: modes.find(m => m.active)
+
+    MouseArea {
+        id: hoverArea
+        anchors.fill: bg
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: {
+            if (root.mode.name === "notification") {
+                Notifications.dimissCurrent()
+            } else if (root.mode.name === "clock") {
+                pulse.restart()
+                Launcher.launch()
+            }
+        }
+    }
 
     Rectangle {
         id: bg
@@ -124,12 +139,8 @@ Item {
     }
 
     Component {
-        id: calendarMode
-        CalendarView {
-            anchors.top: parent.top
-            anchors.topMargin: 12
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
+        id: centralMode
+        CentralView { anchors.fill: parent }
     }
 
     Component {
@@ -143,11 +154,6 @@ Item {
 
 // ---- comportamento gerla ----------------------
 
-    Timer {
-        id: pulse
-        interval: 140
-    }
-
     Connections {
         target: Notifications
         function onCurrentChanged() {
@@ -155,18 +161,7 @@ Item {
         }
     }
 
-    MouseArea {
-        id: hoverArea
-        anchors.fill: bg
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            if (root.mode.name === "notification") {
-                Notifications.dimissCurrent()
-            } else {
-                pulse.restart()
-                Launcher.launch()
-            }
-        }
-    }
+    Timer { id: pulse; interval: 140 }
+
+
 }
