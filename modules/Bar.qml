@@ -61,8 +61,7 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: Config.spacing
 
-            MemoryWidget {}
-            CpuWidget {}
+            WorkspacesWidget {}
             TemperatureWidget {}
             ScreenTimeWidget {}
         }
@@ -75,8 +74,6 @@ PanelWindow {
             
             TrayWidget {}
             WifiWidget {}
-            VolumeWidget {}
-            BrightnessWidget {}
             BatteryWidget {}
         }
     }
