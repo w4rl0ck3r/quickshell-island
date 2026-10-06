@@ -7,31 +7,36 @@ de teclado (modo de carregamento, perfil de energia e desligamento).
 ## Estrutura
 
 ```
-quickshell-bar/
-├── shell.qml                  # entrada: instancia a Bar por monitor + atalhos
+quickshell/
+├── shell.qml                  # entrada: instancia a Bar por monitor
 ├── config/
 │   ├── Theme.qml              # cores, raios, fontes, durações de animação
 │   └── Config.qml             # dimensões e comandos externos (rofi, lock...)
 ├── components/
 │   └── Pill.qml               # bloco base (ícone + rótulo) dos widgets
 ├── services/                  # singletons que fazem polling do sistema
-│   ├── Cpu.qml  Memory.qml  Temperature.qml
-│   ├── Network.qml  Audio.qml  Brightness.qml
-│   ├── Battery.qml  ScreenTime.qml
+│   ├── Heartbeat.qml          # timer global de 1s (fonte única de ticks)
+│   ├── Cpu.qml  Memory.qml  Temperature.qml  ScreenTime.qml
+│   ├── Network.qml  Audio.qml  Brightness.qml  Battery.qml
+│   ├── Bluetooth.qml  Weather.qml  Tray.qml  Notifications.qml
 │   └── Launcher.qml           # dispara o rofi
 ├── widgets/                   # um arquivo por widget lateral
 │   ├── CpuWidget.qml  MemoryWidget.qml  TemperatureWidget.qml
 │   ├── ScreenTimeWidget.qml  WifiWidget.qml  VolumeWidget.qml
-│   ├── BrightnessWidget.qml  BatteryWidget.qml
+│   ├── BrightnessWidget.qml  BatteryWidget.qml  TrayWidget.qml
 ├── island/
-│   ├── DynamicIsland.qml      # relógio ↔ calendário ↔ pulso de busca
-│   └── CalendarView.qml
+│   ├── DynamicIsland.qml      # ilha orientada a modos (lista priorizada)
+│   ├── CentralView.qml        # painel central: relógio, clima, calendário,
+│   │                          #   stats, sliders de brilho/volume, ações
+│   ├── CalendarView.qml       # mini calendário do mês
+│   ├── NotificationView.qml   # notificação atual na ilha
+│   ├── ActionButton.qml  StatTile.qml
 ├── menus/                     # cada um é um singleton com seu PopupWindow
 │   ├── ChargeModeMenu.qml
 │   ├── PowerProfileMenu.qml
 │   └── PowerMenu.qml
 ├── shortcuts/
-│   └── Shortcuts.qml          # GlobalShortcut (hyprland_global_shortcuts_v1)
+│   └── Shortcuts.qml          # GlobalShortcut (desativado por padrão)
 ├── scripts/
 │   └── set-charge-mode.sh     # AJUSTE para o seu hardware (ver abaixo)
 ├── modules/
@@ -44,6 +49,27 @@ Cada peça vive em seu próprio arquivo — widgets, serviços, menus e
 componentes são independentes, então adicionar/remover um item da barra
 é só criar o `.qml` e importar em `Bar.qml`.
 
+## Dynamic Island em modos
+
+`DynamicIsland.qml` usa uma lista priorizada de modos:
+
+```qml
+readonly property var modes: [
+    { name: "notification", active: Notifications.current !== null, ... },
+    { name: "central",      active: root.hovering,                ... },
+    { name: "clock",        active: true,                         ... },  // fallback
+]
+```
+
+O primeiro modo com `active: true` vence. A ilha fica colada no topo da
+tela com cantos superiores invertidos ("wings"), e sua janela usa `mask`
+para que só a barra + ilha recebam clique.
+
+O modo **central** (hover) mostra: relógio grande, data por extenso,
+clima, calendário do mês, tiles de memória/CPU/tempo de tela/Bluetooth,
+sliders verticais de brilho e volume, botões de modo de carregamento e
+perfil de energia, e desligar com confirmação inline.
+
 ## Dependências
 
 - `quickshell` (git ou AUR) com suporte a Hyprland habilitado
@@ -55,30 +81,34 @@ componentes são independentes, então adicionar/remover um item da barra
 - `lm_sensors` (temperatura — rode `sensors-detect` uma vez)
 - `power-profiles-daemon` (fornece `powerprofilesctl`)
 - `hyprlock` (ou troque `Config.lockCommand` pelo seu bloqueador)
-- Fonte com emoji (ex: `noto-fonts-emoji`) e a fonte `Inter` instalada
-  (ou troque `Theme.fontFamily`)
+- `curl` (clima — `services/Weather.qml` via open-meteo)
+- `libnotify` (`notify-send` — alertas de bateria)
+- Fonte com emoji (ex: `noto-fonts-emoji`), Nerd Font para ícones dos
+  widgets e a fonte `Inter` (ou troque `Theme.fontFamily`)
 
 ## Instalação
 
 ```bash
 mkdir -p ~/.config/quickshell
-cp -r quickshell-bar ~/.config/quickshell/bar
+git clone <repo> ~/.config/quickshell
 
 # testar manualmente
-quickshell -c bar
+quickshell
 ```
 
 Para iniciar junto com a sessão, no `hyprland.conf`:
 
 ```
-exec-once = quickshell -c bar
+exec-once = quickshell
 ```
 
 ## Atalhos de teclado (Hyprland)
 
 O Quickshell expõe os atalhos via `hyprland_global_shortcuts_v1`; quem
 define a combinação de teclas é o **Hyprland**, apontando para o nome
-declarado em `shortcuts/Shortcuts.qml`:
+declarado em `shortcuts/Shortcuts.qml`. Os atalhos estão **desativados
+por padrão** (linha comentada em `shell.qml`); reative instanciando
+`Shortcuts {}` no `ShellRoot` e adicione no `hyprland.conf`:
 
 ```
 bind = SUPER, SPACE,   global, quickshell:search        # abre o rofi
@@ -97,14 +127,14 @@ depende do fabricante. Abra `scripts/set-charge-mode.sh` e adapte:
 - **ASUS**: use `asusctl charge-limit --set <n>`
 - **ThinkPad**: use `tlp setcharge <start> <stop> BAT0`
 - **Genérico via kernel** (usado no script de exemplo): escreve em
-  `/sys/class/power_supply/BAT0/charge_control_end_threshold`, o que
-  exige `sudo`. Crie uma regra sem senha **apenas para esse script**:
+  `/sys/class/power_supply/BAT0/charge_types`, o que exige `sudo`.
+  Crie uma regra sem senha **apenas para esse script**:
 
   ```bash
   sudo visudo -f /etc/sudoers.d/quickshell-charge
   ```
   ```
-  seu_usuario ALL=(root) NOPASSWD: /usr/bin/tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+  seu_usuario ALL=(root) NOPASSWD: /usr/bin/tee /sys/class/power_supply/BAT0/charge_types
   ```
 
 ## Outros ajustes rápidos
@@ -115,8 +145,11 @@ depende do fabricante. Abra `scripts/set-charge-mode.sh` e adapte:
   `power-saver` são os nomes usados pelo `power-profiles-daemon`.
 - **Tempo de tela**: como o Linux/Wayland não tem uma API padrão de
   screen-time, `services/ScreenTime.qml` usa o uptime do sistema como
-  aproximação. Se você tiver um tracker próprio, troque o comando do
-  `Process` nesse arquivo para ler o dado real.
+  aproximação. Troque a leitura em `_parseUptime()` para ler o dado real.
+- **Clima**: edite `Config.weatherLatitude` / `Config.weatherLongitude`
+  para sua localização.
+- **Brilho**: ajuste `Brightness.device` em `services/Brightness.qml`
+  para o seu backlight (`ls /sys/class/backlight/`).
 - **Cores/raios/fonte**: tudo centralizado em `config/Theme.qml`.
 
 
