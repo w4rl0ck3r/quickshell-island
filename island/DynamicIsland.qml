@@ -42,6 +42,14 @@ Item {
             component: notificationMode
         },
         {
+            name: "wallpaper",
+            active: Wallpapers.active,
+            width: Config.islandCentralWidth,
+            height: 300,
+            bg: Theme.dashBg,
+            component: wallpaperMode
+        },
+        {
             nname: "central",
             active: root.hovering,
             width: Config.islandCentralWidth,
@@ -180,6 +188,11 @@ Item {
                 }
             }
         } 
+    }
+
+    Component {
+        id: wallpaperMode
+        WallpaperView { anchors.fill: parent }
     }
 
     Component {

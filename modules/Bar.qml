@@ -5,6 +5,7 @@ import "../config"
 import "../widgets"
 import "../island"
 import "../menus"
+import "../services"
 
 // Barra principal: PanelWindow fixado no topo, com widgets fixos nas
 // laterais e a Dynamic Island centralizada.
@@ -32,6 +33,9 @@ PanelWindow {
     // fixamos a zona exclusiva no tamanho real da barra visível; setar
     // exclusiveZone também muda exclusionMode para Normal sozinho.
     exclusiveZone: Config.barHeight
+
+    // Só aceita foco de teclado enquanto o picker de wallpaper está aberto
+    focusable: Wallpapers.active
 
     mask: Region {
         item: barBackground

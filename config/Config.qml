@@ -27,6 +27,10 @@ QtObject {
     // Dispositivo de bateria (troque para BAT1 se necessário: ls /sys/class/power_supply/)
     readonly property string batteryDevice: "BAT0"
 
+    // Wallpaper picker (services/Wallpapers.qml + island/WallpaperView.qml)
+    readonly property string wallpapersDir: "/home/w4rl0ck3r/Images/wallpapers"
+    readonly property string wallpaperMonitor: "eDP-1"
+
     // Coordenadas para card de clima
     readonly property real weatherLatitude: -21.9339
     readonly property real weatherLongitude: -42.1286

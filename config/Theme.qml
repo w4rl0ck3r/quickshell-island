@@ -2,36 +2,37 @@ pragma Singleton
 import QtQuick
 
 // Paleta e tokens visuais centrais da barra.
-// Alterar cores/raios aqui reflete em todos os componentes.
+// As cores vêm do matugen (config/Theme.json via Colors.qml); aqui ficam
+// geometria, tipografia e animação fixas + os aliases para as cores.
 QtObject {
     // Base da barra
-    readonly property color base: '#f8f8f8'
-    readonly property color text: "#F8F8F8"
-    readonly property color subtle: "#8A8A8A"
-    readonly property color hover: "#ECECEC"
-    readonly property color border: "#E7E7E7"
+    readonly property color base: Colors.base
+    readonly property color text: Colors.text
+    readonly property color subtle: Colors.subtle
+    readonly property color hover: Colors.hover
+    readonly property color border: Colors.border
 
-   // separada da cápsula escura usada no relógio/notificação.
-    readonly property color dashBg: "#FBF4F0"
-    readonly property color dashCard: "#F6E4DE"
-    readonly property color dashCardHover: "#F0D7CE"
-    readonly property color dashText: "#3B2420"
-    readonly property color dashSubtext: "#9C7D74"
-    readonly property color dashAccent: "#A84432"
-    readonly property color dashDivider: "#E8CFC5"
+    // Central da ilha (fundo creme/escuro dependendo do modo do matugen)
+    readonly property color dashBg: Colors.dashBg
+    readonly property color dashCard: Colors.dashCard
+    readonly property color dashCardHover: Colors.dashCardHover
+    readonly property color dashText: Colors.dashText
+    readonly property color dashSubtext: Colors.dashSubtext
+    readonly property color dashAccent: Colors.dashAccent
+    readonly property color dashDivider: Colors.dashDivider
 
-    // Dynamic Island (contraste estilo iPhone sobre a barra clara)
-    readonly property color islandBg: "#1C1C1E"
-    readonly property color islandText: "#F8F8F8"
-    readonly property color islandSubtle: "#8E8E93"
-    readonly property color islandTextSubtle: "#C7C7CC"
-    readonly property color islandAccent: "#E0A479"   // acento quente (terracota) usado nos cards da central
+    // Dynamic Island
+    readonly property color islandBg: Colors.islandBg
+    readonly property color islandText: Colors.islandText
+    readonly property color islandSubtle: Colors.islandSubtle
+    readonly property color islandTextSubtle: Colors.islandTextSubtle
+    readonly property color islandAccent: Colors.islandAccent
 
     // Status colors
-    readonly property color warning: "#f9e2af"
-    readonly property color alert: "#f38ba8"
-    readonly property color ok: "#a6e3a1"
-    readonly property color cool: "#42a5f5"
+    readonly property color warning: Colors.warning
+    readonly property color alert: Colors.alert
+    readonly property color ok: Colors.ok
+    readonly property color cool: Colors.cool
 
     // Geometria
     readonly property int radius: 16
@@ -45,4 +46,3 @@ QtObject {
     readonly property int animFast: 130
     readonly property int animNormal: 260
 }
- 

@@ -70,6 +70,20 @@ clima, calendário do mês, tiles de memória/CPU/tempo de tela/Bluetooth,
 sliders verticais de brilho e volume, botões de modo de carregamento e
 perfil de energia, e desligar com confirmação inline.
 
+O modo **wallpaper** (atalho `quickshell:wallpaper`) mostra uma busca +
+linha de previews: digite para filtrar, use ←/→ para navegar, Enter
+aplica e Esc fecha. O wallpaper é aplicado via `hyprctl hyprpaper`
+(modo cover), sem editar arquivo de config.
+
+**Atalho de exemplo (hyprland binds):**
+```
+bind = SUPER SHIFT, W, global, quickshell:wallpaper
+```
+
+`Config.wallpapersDir` e `Config.wallpaperMonitor` controlam a pasta e o
+monitor usado pelo picker. `Bar.qml` só torna a janela focável enquanto
+essa modo está aberto (para o campo de busca receber teclas).
+
 ## Dependências
 
 - `quickshell` (git ou AUR) com suporte a Hyprland habilitado
@@ -106,15 +120,12 @@ exec-once = quickshell
 
 O Quickshell expõe os atalhos via `hyprland_global_shortcuts_v1`; quem
 define a combinação de teclas é o **Hyprland**, apontando para o nome
-declarado em `shortcuts/Shortcuts.qml`. Os atalhos estão **desativados
-por padrão** (linha comentada em `shell.qml`); reative instanciando
-`Shortcuts {}` no `ShellRoot` e adicione no `hyprland.conf`:
+declarado em `shortcuts/Shortcuts.qml`. Hoje só existe o atalho do
+seletor de wallpaper; adicione mais nomes em `Shortcuts.qml` se
+quiser outros:
 
 ```
-bind = SUPER, SPACE,   global, quickshell:search        # abre o rofi
-bind = SUPER, B,       global, quickshell:chargeMode    # fast/standard/long_life
-bind = SUPER, P,       global, quickshell:powerProfile  # performance/balanced/economy
-bind = SUPER, ESCAPE,  global, quickshell:powerMenu      # trancar / desligar
+bind = SUPER SHIFT, W, global, quickshell:wallpaper   # seletor de wallpaper
 ```
 
 (`quickshell` é o `appid` padrão; troque se você definir outro.)
