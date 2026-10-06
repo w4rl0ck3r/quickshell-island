@@ -1,35 +1,46 @@
 import QtQuick
+import QtQuick.Layouts
 import "../config"
 
 // Mini calendário do mês atual, gerado em QML puro (sem dependências).
-Column {
+ColumnLayout {
     id: root
-    spacing: 4
+
+    spacing: 6
     property var today: new Date()
     readonly property var monthNames: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
     readonly property var weekDays: ["D","S","T","Q","Q","S","S"]
 
+    // Atualiza a data a cada minuto (barato; muda algo só à meia-noite)
+    Timer {
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: root.today = new Date()
+    }
+
     Text {
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: root.monthNames[root.today.getMonth()] + " " + root.today.getFullYear()
-        color: Theme.islandText
+        Layout.alignment: Qt.AlignHCenter
+        text: monthNames[root.today.getMonth()] + " " + root.today.getFullYear()
+        color: Theme.dashText
         font.family: Theme.fontFamily
         font.bold: true
-        font.pixelSize: Theme.fontSize - 1
+        font.pixelSize: Theme.fontSize
     }
 
     Grid {
+        Layout.alignment: Qt.AlignHCenter
         columns: 7
-        spacing: 3
-        anchors.horizontalCenter: parent.horizontalCenter
+        spacing: 4
 
         Repeater {
             model: root.weekDays
             delegate: Text {
                 text: modelData
-                width: 15
+                width: 18
                 horizontalAlignment: Text.AlignHCenter
-                color: Theme.islandSubtle
+                color: Theme.dashSubtext
+                font.family: Theme.fontFamily
                 font.pixelSize: 9
             }
         }
@@ -45,15 +56,16 @@ Column {
                 return cells
             }
             delegate: Rectangle {
-                width: 15
-                height: 15
-                radius: 7
-                color: modelData === root.today.getDate() ? Theme.islandText : "transparent"
+                width: 18
+                height: 18
+                radius: 9
+                color: modelData === root.today.getDate() ? Theme.dashAccent : "transparent"
                 Text {
                     anchors.centerIn: parent
                     text: modelData === 0 ? "" : modelData
-                    color: modelData === root.today.getDate() ? Theme.islandBg : Theme.islandTextSubtle
-                    font.pixelSize: 8
+                    color: modelData === root.today.getDate() ? Theme.base : Theme.dashText
+                    font.family: Theme.fontFamily
+                    font.pixelSize: 9
                 }
             }
         }

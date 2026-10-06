@@ -7,45 +7,49 @@ import "../config"
 QtObject {
     id: root
     
+    property int cpuTemp: 0
+    property int gpuTemp: 0
+
     property string hwmonCpuPath: "/sys/class/hwmon/hwmon5"
     property string hwmonGpuPath: "/sys/class/hwmon/hwmon4"
 
-    property int cpuTemp: {
-        const raw = parseInt(cpuTempFile.text())
-
-        return isNaN(raw) ? 0 : Math.round(raw / 1000)
-    }
-
-    property int gpuTemp: {
-        const raw = parseInt(gpuTempFile.text())
-
-        return isNaN(raw) ? 0 : Math.round(raw / 1000)
-    }
-
     property FileView cpuTempFile: FileView {
         path: root.hwmonCpuPath + "/temp1_input"
+        onLoaded: root._parseCpuTemp()
     }
 
     property FileView gpuTempFile: FileView {
         path: root.hwmonGpuPath + "/temp1_input"
+        onLoaded: root._parseGpuTemp()
     }
 
-    property Timer timer: Timer {
-        interval: 4000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.cpuTempFile.reload()
+    property Connections _heartbeat: Connections {
+        target: Heartbeat
+        function onTick3s() {
+            root.cpuTempFile.reload()
+            root.gpuTempFile.reload()
+        }
+    }
+    
+    function _parseCpuTemp() {
+        const text = cpuTempFile.text()
+        if (!text) return
+
+        const raw = parseInt(text.trim(), 10)
+        if (!isNaN(raw) && raw > 0) {
+            root.cpuTemp = Math.round(raw /1000)
+        }
     }
 
-    property Timer timer2: Timer {
-        interval: 4000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.gpuTempFile.reload()
-    }
+    function _parseGpuTemp() {
+        const text = gpuTempFile.text()
+        if (!text) return
 
+        const raw = parseInt(text.trim(), 10)
+        if (!isNaN(raw) && raw > 0) {
+            root.gpuTemp = Math.round(raw /1000)
+        }
+    }
 }
 
 // /hwmon2/name:BAT0
