@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Shapes
 import "../config"
 import "../services"
 
@@ -16,14 +17,20 @@ import "../services"
 //   1. Criar o visual em island/AlgumaCoisaView.qml (ou inline aqui).
 //   2. Declarar um `Component { id: algumaCoisaMode; ... }` abaixo.
 //   3. Inserir um item em `modes` na posição de prioridade desejada.
+
 Item {
     id: root
+    
     implicitWidth: bg.width
     implicitHeight: bg.height
 
     property alias maskItem: bg
 
-    property bool hovering: hoverArea.containsMouse
+    property bool hovering: hoverHandler.hovered
+
+    scale: pulse.running ? 1.08 : 1.0
+    transformOrigin: Item.Top
+    Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
 
     readonly property var modes: [
         {
@@ -31,6 +38,7 @@ Item {
             active: Notifications.current !== null,
             width: Config.islandNotifWidth,
             height: Config.islandNotifHeight,
+            bg: Theme.islandBg,
             component: notificationMode
         },
         {
@@ -38,6 +46,7 @@ Item {
             active: root.hovering,
             width: Config.islandCentralWidth,
             height: Config.islandCentralHeight,
+            bg: Theme.dashBg,
             component: centralMode
         },
         {
@@ -45,52 +54,77 @@ Item {
             active: true,
             width: Config.islandCollapsedWidth,
             height: Config.islandCollapsedHeight,
+            bg: Theme.islandBg,
             component: clockMode
         }
     ]
 
     readonly property var mode: modes.find(m => m.active)
 
-    MouseArea {
-        id: hoverArea
-        anchors.fill: bg
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: {
-            if (root.mode.name === "notification") {
-                Notifications.dimissCurrent()
-            } else if (root.mode.name === "clock") {
-                pulse.restart()
-                Launcher.launch()
-            }
-        }
-    }
-
     Rectangle {
         id: bg
         radius: Math.min(height / 2, 28)
         color: Theme.islandBg
+        clip: true
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: 5
-        scale: pulse.running ? 1.08 : 1.0
 
         width: root.mode.width
         height: root.mode.height
 
+        // Top corners are squared off so the wings (concave arcs) below
+        // can merge smoothly into the top edge of the screen.
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: parent.height / 2
+            color: Theme.islandBg
+        }
+
         border.width: root.mode.name === "notification" && Notifications.critical ? 1 : 0
         border.color: Theme.alert
 
-        Behavior on width { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutExpo } }
+        Behavior on color  { ColorAnimation  { duration: Theme.animNormal } }
+        Behavior on width  { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutExpo } }
         Behavior on height { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutExpo } }
-        Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
 
+        HoverHandler {
+            id:hoverHandler
+        }
         // Para instanciar somente o modo ativo, o anterior é destruído
         Loader {
             anchors.fill: parent
             sourceComponent: root.mode.component
             opacity: item ? 1 : 0
             Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
+        }
+    }
+
+    // Wings: concave "inverted corners" that make the island look like it
+    // hangs from the top edge of the screen. Same color as the island.
+    readonly property int wing: 12
+
+    Shape {
+        anchors.top: bg.top
+        anchors.right: bg.left
+        width: root.wing
+        height: root.wing
+        ShapePath {
+            fillColor: Theme.islandBg
+            strokeWidth: 0
+            PathSvg { path: "M 0 0 L " + root.wing + " 0 L " + root.wing + " " + root.wing + " A " + root.wing + " " + root.wing + " 0 0 0 0 0 Z" }
+        }
+    }
+    Shape {
+        anchors.top: bg.top
+        anchors.left: bg.right
+        width: root.wing
+        height: root.wing
+        ShapePath {
+            fillColor: Theme.islandBg
+            strokeWidth: 0
+            PathSvg { path: "M " + root.wing + " 0 L 0 0 L 0 " + root.wing + " A " + root.wing + " " + root.wing + " 0 0 1 " + root.wing + " 0 Z" }
         }
     }
 
@@ -118,6 +152,7 @@ Item {
                     }
                 }
             }
+            
             Text {
                 id: clockText
                
@@ -135,6 +170,15 @@ Item {
                     }
                 }
             }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    pulse.restart()
+                    Launcher.launch()
+                }
+            }
         } 
     }
 
@@ -145,9 +189,19 @@ Item {
 
     Component {
         id: notificationMode
-        NotificationView {
+        Item {
             anchors.fill: parent
-            notification: Notifications.current
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: QtPointingHandCursor
+                onClicked: Notifications.dimissCurrent()
+            }
+
+            NotificationView {
+                anchors.fill: parent
+                notification: Notifications.current
+            }
         }
     }
 
