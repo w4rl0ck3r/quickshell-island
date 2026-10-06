@@ -91,66 +91,24 @@ Item {
             radius: Theme.radius
             color: Theme.dashCard
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: 16
-                spacing: 16
+            ColumnLayout {
+                anchors.centerIn: parent
+                spacing: 2
 
-                // Relógio + data
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter
-                    spacing: 2
-
-                    Text {
-                        text: Qt.formatTime(root.now, "HH:mm")
-                        color: Theme.dashText
-                        font.family: Theme.fontFamily
-                        font.bold: true
-                        font.pixelSize: 42
-                    }
-                    Text {
-                        text: root.weekdays[root.now.getDay()] + ", " + root.now.getDate() + " de " + root.months[root.now.getMonth()]
-                        color: Theme.dashSubtext
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSize
-                    }
+                Text {
+                    text: Qt.formatTime(root.now, "HH:mm")
+                    color: Theme.dashText
+                    font.family: Theme.fontFamily
+                    font.bold: true
+                    font.pixelSize: 42
+                    Layout.alignment: Qt.AlignHCenter
                 }
-
-                // Separador vertical sutil
-                Rectangle {
-                    Layout.preferredWidth: 1
-                    Layout.fillHeight: true
-                    Layout.topMargin: 12
-                    Layout.bottomMargin: 12
-                    color: Theme.dashDivider
-                }
-
-                // Clima
-                ColumnLayout {
-                    Layout.alignment: Qt.AlignVCenter
-                    spacing: 2
-
-                    Text {
-                        text: Weather.icon
-                        font.pixelSize: 30
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                    Text {
-                        text: Weather.ready ? Math.round(Weather.temperature) + "°C" : "—"
-                        color: Theme.dashText
-                        font.family: Theme.fontFamily
-                        font.bold: true
-                        font.pixelSize: Theme.fontSize + 6
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                    Text {
-                        text: Weather.condition
-                        color: Theme.dashSubtext
-                        font.family: Theme.fontFamily
-                        font.pixelSize: Theme.fontSize - 2
-                        Layout.alignment: Qt.AlignHCenter
-                    }
+                Text {
+                    text: root.weekdays[root.now.getDay()] + ", " + root.now.getDate() + " de " + root.months[root.now.getMonth()]
+                    color: Theme.dashSubtext
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSize
+                    Layout.alignment: Qt.AlignHCenter
                 }
             }
         }
@@ -184,6 +142,41 @@ Item {
                         return Math.min(sx, sy, 2.2)
                     }
                     transformOrigin: Item.Center
+                }
+            }
+
+            // Card do clima (entre calendário e sliders)
+            Rectangle {
+                Layout.preferredWidth: 100
+                Layout.fillHeight: true
+                radius: Theme.radius
+                color: Theme.dashCard
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+                    spacing: 2
+
+                    Text {
+                        text: Weather.icon
+                        font.pixelSize: 30
+                        color: Theme.dashText
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    Text {
+                        text: Weather.ready ? Math.round(Weather.temperature) + "°C" : "—"
+                        color: Theme.dashText
+                        font.family: Theme.fontFamily
+                        font.bold: true
+                        font.pixelSize: Theme.fontSize + 6
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+                    Text {
+                        text: Weather.condition
+                        color: Theme.dashSubtext
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSize - 2
+                        Layout.alignment: Qt.AlignHCenter
+                    }
                 }
             }
 

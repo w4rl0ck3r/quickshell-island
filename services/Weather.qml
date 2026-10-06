@@ -41,7 +41,7 @@ QtObject {
     }
 
     property Process proc: Process {
-        command: ["curl", "-s", "--max-time", "5",
+        command: ["curl", "-s", "--max-time", "5", "--connect-timeout", "3",
             "https://api.open-meteo.com/v1/forecast?latitude=" + Config.weatherLatitude
             + "&longitude=" + Config.weatherLongitude
             + "&current=temperature_2m,weather_code&timezone=auto"]
@@ -59,17 +59,29 @@ QtObject {
         }
     }
 
-    // Conecta ao Heartbeat no tick de 60s
     property int _minuteCounter: 0
     property Connections _heartbeat: Connections {
         target: Heartbeat
         function onTick60s() {
-            root._minuteCounter++
-            // 20 minutos = 20 ciclos de 60s
-            if (root._minuteCounter >= 20 || !root.ready) {
-                root._minuteCounter = 0
+            // Enquanto estiver pronto: refresh a cada 20 minutos (20 ticks de 60s).
+            // Tentativa de retry para quando ainda não há dado fica no onTick5s.
+            if (root.ready) {
+                root._minuteCounter++
+                if (root._minuteCounter >= 20) {
+                    root._minuteCounter = 0
+                    proc.running = true
+                }
+            }
+        }
+        function onTick5s() {
+            // Se a última tentativa falhou, tenta de novo a cada 5s
+            // (sem criar Timer próprio). Assim que conseguir,
+            // root.ready = true e o refresh passa a ser de 20 em 20 min.
+            if (!root.ready) {
                 proc.running = true
             }
         }
     }
+
+    Component.onCompleted: proc.running = true
 }
