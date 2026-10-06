@@ -44,6 +44,7 @@ PanelWindow {
         if (!ChargeModeMenu.barWindow) ChargeModeMenu.barWindow = bar
         if (!PowerProfileMenu.barWindow) PowerProfileMenu.barWindow = bar
         if (!PowerMenu.barWindow) PowerMenu.barWindow = bar
+        if (!Tray.barWindow) Tray.barWindow = bar
     }
 
     Rectangle {
@@ -71,7 +72,8 @@ PanelWindow {
             anchors.rightMargin: Config.margin
             anchors.verticalCenter: parent.verticalCenter
             spacing: Config.spacing
-
+            
+            TrayWidget {}
             WifiWidget {}
             VolumeWidget {}
             BrightnessWidget {}
@@ -83,6 +85,6 @@ PanelWindow {
         id: island
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: (Config.barHeight - Config.islandCollapsedHeight) / 2
+        anchors.topMargin: 0
     }
 }
