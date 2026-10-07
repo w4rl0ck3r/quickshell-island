@@ -111,7 +111,7 @@ Item {
 
     // Wings: concave "inverted corners" that make the island look like it
     // hangs from the top edge of the screen. Same color as the island.
-    readonly property int wing: 12
+    readonly property int wing: 19
 
     Shape {
         anchors.top: bg.top
