@@ -50,7 +50,7 @@ Item {
             component: wallpaperMode
         },
         {
-            nname: "central",
+            name: "central",
             active: root.hovering,
             width: Config.islandCentralWidth,
             height: Config.islandCentralHeight,
@@ -205,15 +205,15 @@ Item {
         Item {
             anchors.fill: parent
 
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: QtPointingHandCursor
-                onClicked: Notifications.dimissCurrent()
-            }
-
             NotificationView {
                 anchors.fill: parent
                 notification: Notifications.current
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: Notifications.dismissCurrent()
             }
         }
     }
