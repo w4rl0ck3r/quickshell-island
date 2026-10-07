@@ -65,7 +65,7 @@ QtObject {
         const path = Config.wallpapersDir + "/" + fileName
         applyProc.command = ["sh", "-c",
             "hyprctl hyprpaper wallpaper '" + Config.wallpaperMonitor + "," + path + ",cover'" +
-            " && matugen image -m 'dark' --type scheme-tonal-spot --prefer saturation\"" + path + "\"" +
+            " && matugen image -m 'smart' --type scheme-vibrant --prefer saturation \"" + path + "\"" +
             " && hyprctl reload" +
             // Persiste: atualiza o path no hyprpaper.conf para o próximo boot
             " && sed -i 's|path = .*|path = " + path + "|' \"$HOME/.config/hypr/hyprpaper.conf\""

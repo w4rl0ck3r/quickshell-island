@@ -52,19 +52,28 @@ QtObject {
                     root.temperature = json.current.temperature_2m
                     root.weatherCode = json.current.weather_code
                     root.ready = true
+                    root._onResult(true)
                 } catch (e) {
                     // offline ou resposta inválida — mantém o último valor
+                    root._onResult(false)
                 }
             }
+        }
+        onExited: exitCode => {
+            if (exitCode !== 0) root._onResult(false)
         }
     }
 
     property int _minuteCounter: 0
+    // Backoff do retry: nº de ticks de 5s entre tentativas (1 → 2 → 6 → 12)
+    // e o índice no degrau atual.
+    readonly property var _retryLadder: [1, 2, 6, 12]
+    property int _retryStep: 0
+    property int _retryTicks: 1
     property Connections _heartbeat: Connections {
         target: Heartbeat
         function onTick60s() {
             // Enquanto estiver pronto: refresh a cada 20 minutos (20 ticks de 60s).
-            // Tentativa de retry para quando ainda não há dado fica no onTick5s.
             if (root.ready) {
                 root._minuteCounter++
                 if (root._minuteCounter >= 20) {
@@ -74,12 +83,25 @@ QtObject {
             }
         }
         function onTick5s() {
-            // Se a última tentativa falhou, tenta de novo a cada 5s
+            // Se a última tentativa falhou, tenta de novo com backoff
             // (sem criar Timer próprio). Assim que conseguir,
             // root.ready = true e o refresh passa a ser de 20 em 20 min.
-            if (!root.ready) {
-                proc.running = true
+            if (root.ready) return
+            if (root._retryTicks > 1) {
+                root._retryTicks--
+                return
             }
+            proc.running = true
+        }
+    }
+
+    function _onResult(ok) {
+        if (ok) {
+            root._retryStep = 0
+            root._retryTicks = 1
+        } else {
+            root._retryStep = Math.min(root._retryStep + 1, root._retryLadder.length - 1)
+            root._retryTicks = root._retryLadder[root._retryStep]
         }
     }
 

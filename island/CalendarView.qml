@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import "../config"
+import "../services"
 
 // Mini calendário do mês atual, gerado em QML puro (sem dependências).
 ColumnLayout {
@@ -11,12 +12,10 @@ ColumnLayout {
     readonly property var monthNames: ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]
     readonly property var weekDays: ["D","S","T","Q","Q","S","S"]
 
-    // Atualiza a data a cada minuto (barato; muda algo só à meia-noite)
-    Timer {
-        interval: 60000
-        running: true
-        repeat: true
-        onTriggered: root.today = new Date()
+    // Atualiza a data no tick60s do Heartbeat — sem Timer próprio.
+    property Connections _todayTick: Connections {
+        target: Heartbeat
+        function onTick60s() { root.today = new Date() }
     }
 
     Text {

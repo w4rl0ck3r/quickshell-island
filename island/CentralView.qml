@@ -40,11 +40,10 @@ Item {
         }
     }
 
-    Timer {
-        interval: 1000
-        running:  true
-        repeat:   true
-        onTriggered: root.now = new Date()
+    // Relógio: atualizado pelo Heartbeat (tick1s) — sem Timer próprio.
+    property Connections _clockTick: Connections {
+        target: Heartbeat
+        function onTick1s() { root.now = new Date() }
     }
 
     Timer {
@@ -62,11 +61,10 @@ Item {
             onRead: line => { root.powerProfile = line.trim() }
         }
     }
-    Timer {
-        interval: 5000
-        running: true
-        repeat: true
-        onTriggered: powerProfileProc.running = true
+    // Reconsulta o perfil de energia no tick5s do Heartbeat.
+    property Connections _profileTick: Connections {
+        target: Heartbeat
+        function onTick5s() { powerProfileProc.running = true }
     }
 
     Process {

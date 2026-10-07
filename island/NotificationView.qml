@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Effects
 import Quickshell
+import Quickshell.Widgets
 import Quickshell.Services.Notifications
 import "../config"
 
@@ -40,26 +40,18 @@ Item {
             Layout.preferredHeight: 48
             Layout.alignment: Qt.AlignVCenter
 
-            Image {
-                id: img
+            // ClippingRectangle faz o corte arredondado sem o passe
+            // offscreen do MultiEffect (muito mais barato por frame).
+            ClippingRectangle {
                 anchors.fill: parent
-                source: root.imageSource
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                sourceSize: Qt.size(96, 96)
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    maskEnabled: true
-                    maskSource: thumbMask
+                radius: 12
+                Image {
+                    anchors.fill: parent
+                    source: root.imageSource
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    sourceSize: Qt.size(96, 96)
                 }
-            }
-
-            Item {
-                id: thumbMask
-                anchors.fill: parent
-                visible: false
-                layer.enabled: true
-                Rectangle { anchors.fill: parent; radius: 12 }
             }
         }
 
@@ -75,7 +67,7 @@ Item {
                 Rectangle {
                     visible: root.critical
                     width: 6; height: 6; radius: 3
-                    color: Theme.statusCritical
+                    color: Theme.alert
                 }
 
                 Text {
