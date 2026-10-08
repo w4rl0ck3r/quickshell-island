@@ -113,13 +113,16 @@ Item {
     // hangs from the top edge of the screen. Same color as the island.
     readonly property int wing: 19
 
+    // O fill segue `bg.color` (e não Theme.islandBg) para que as asas
+    // herdem o mesmo valor — inclusive a animação do Behavior — e nunca
+    // fiquem pretas no primeiro login enquanto o Colors ainda carrega.
     Shape {
         anchors.top: bg.top
         anchors.right: bg.left
         width: root.wing
         height: root.wing
         ShapePath {
-            fillColor: Theme.islandBg
+            fillColor: bg.color
             strokeWidth: 0
             PathSvg { path: "M 0 0 L " + root.wing + " 0 L " + root.wing + " " + root.wing + " A " + root.wing + " " + root.wing + " 0 0 0 0 0 Z" }
         }
@@ -130,7 +133,7 @@ Item {
         width: root.wing
         height: root.wing
         ShapePath {
-            fillColor: Theme.islandBg
+            fillColor: bg.color
             strokeWidth: 0
             PathSvg { path: "M " + root.wing + " 0 L 0 0 L 0 " + root.wing + " A " + root.wing + " " + root.wing + " 0 0 1 " + root.wing + " 0 Z" }
         }
