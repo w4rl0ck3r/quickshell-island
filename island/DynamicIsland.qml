@@ -171,7 +171,7 @@ Item {
                 color: Theme.islandText
                 font.family: Theme.fontFamily
                 font.bold: true
-                font.pixelSize: Theme.fontSize
+                font.pixelSize: Theme.fontSize + 3
                 text: clock.timeString
 
                 property Connections _heartbeat: Connections {
