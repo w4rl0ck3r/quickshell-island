@@ -30,7 +30,11 @@ Item {
 
     scale: pulse.running ? 1.08 : 1.0
     transformOrigin: Item.Top
-    Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
+    // Animações de mola (SpringAnimation) em vez de Bézier: o morph da
+    // ilha ganha overshoot natural e assenta sem "cortar" no final.
+    // spring  = força da mola (maior = mais rápido)
+    // damping = amortecimento (menor = mais elástico / mais overshoot)
+    Behavior on scale { SpringAnimation { spring: 6; damping: 0.4 } }
 
     readonly property var modes: [
         {
@@ -93,9 +97,9 @@ Item {
         border.width: root.mode.name === "notification" && Notifications.critical ? 1 : 0
         border.color: Theme.alert
 
-        Behavior on color  { ColorAnimation  { duration: Theme.animNormal } }
-        Behavior on width  { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutExpo } }
-        Behavior on height { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutExpo } }
+        Behavior on color  { ColorAnimation { duration: Theme.animNormal } }
+        Behavior on width  { SpringAnimation { spring: 4; damping: 0.4 } }
+        Behavior on height { SpringAnimation { spring: 4; damping: 0.4 } }
 
         HoverHandler {
             id:hoverHandler
@@ -111,7 +115,7 @@ Item {
 
     // Wings: concave "inverted corners" that make the island look like it
     // hangs from the top edge of the screen. Same color as the island.
-    readonly property int wing: 19
+    readonly property int wing: 14
 
     // O fill segue `bg.color` (e não Theme.islandBg) para que as asas
     // herdem o mesmo valor — inclusive a animação do Behavior — e nunca

@@ -23,9 +23,11 @@ RowLayout {
             opacity: mouse.containsMouse ? 1.0 : 0.8
             Layout.alignment: Qt.AlignVCenter
 
-            Behavior on implicitWidth { NumberAnimation { duration: Theme.animNormal; easing.type: Easing.OutExpo } }
-            Behavior on color        { ColorAnimation   { duration: Theme.animFast } }
-            Behavior on opacity      { NumberAnimation { duration: Theme.animFast } }
+            // Mola: o dot ativo "pula" para a largura nova em vez de
+            // deslizar com curva Bézier fixa.
+            Behavior on implicitWidth { SpringAnimation { spring: 8; damping: 0.5 } }
+            Behavior on color         { ColorAnimation   { duration: Theme.animFast } }
+            Behavior on opacity       { NumberAnimation  { duration: Theme.animFast } }
 
             MouseArea {
                 id: mouse
