@@ -17,6 +17,10 @@ QtObject {
     readonly property int islandCentralWidth: 520
     readonly property int islandCentralHeight: 470
 
+    // Modo música (services/Music.qml + island/Waveform.qml)
+    readonly property int islandMusicWidth: 350
+    readonly property int islandMusicHeight: 30
+
     
     // Comandos externos (ajuste conforme seu sistema)
     readonly property string rofiCommand: "rofi -show drun -theme ~/.config/quickshell/rofi/theme.rasi"

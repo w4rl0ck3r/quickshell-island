@@ -19,6 +19,7 @@ quickshell/
 │   ├── Cpu.qml  Memory.qml  Temperature.qml  ScreenTime.qml
 │   ├── Network.qml  Audio.qml  Brightness.qml  Battery.qml
 │   ├── Bluetooth.qml  Weather.qml  Tray.qml  Notifications.qml
+│   ├── Music.qml            # faixa atual via MPRIS (singleton)
 │   └── Launcher.qml           # dispara o rofi
 ├── widgets/                   # um arquivo por widget lateral
 │   ├── CpuWidget.qml  MemoryWidget.qml  TemperatureWidget.qml
@@ -30,6 +31,7 @@ quickshell/
 │   │                          #   stats, sliders de brilho/volume, ações
 │   ├── CalendarView.qml       # mini calendário do mês
 │   ├── NotificationView.qml   # notificação atual na ilha
+│   ├── Waveform.qml           # equalizador de 5 pílulas do modo música
 │   ├── ActionButton.qml  StatTile.qml
 ├── menus/                     # cada um é um singleton com seu PopupWindow
 │   ├── ChargeModeMenu.qml
@@ -57,6 +59,7 @@ componentes são independentes, então adicionar/remover um item da barra
 readonly property var modes: [
     { name: "notification", active: Notifications.current !== null, ... },
     { name: "central",      active: root.hovering,                ... },
+    { name: "music",        active: Music.active,                 ... },
     { name: "clock",        active: true,                         ... },  // fallback
 ]
 ```
@@ -74,6 +77,14 @@ O modo **wallpaper** (atalho `quickshell:wallpaper`) mostra uma busca +
 linha de previews: digite para filtrar, use ←/→ para navegar, Enter
 aplica e Esc fecha. O wallpaper é aplicado via `hyprctl hyprpaper`
 (modo cover), sem editar arquivo de config.
+
+O modo **music** (`services/Music.qml`, MPRIS) aparece enquanto houver
+faixa carregada — tocar ou pausado. Layout: relógio à esquerda,
+`Título — Artista` ao centro (com reticências) e um equalizador de 5
+pílulas à direita que anima só enquanto `Music.playing` é verdadeiro;
+pausado, as barras ficam retas no mínimo (`-----`). Sem controles de
+playback e sem `Timer`: um único `NumberAnimation` dentro de
+`island/Waveform.qml` alimenta a onda e é destruído junto com o modo.
 
 **Atalho de exemplo (hyprland binds):**
 ```

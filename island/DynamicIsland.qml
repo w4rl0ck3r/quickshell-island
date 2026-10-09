@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Shapes
 import "../config"
 import "../services"
@@ -60,6 +61,14 @@ Item {
             height: Config.islandCentralHeight,
             bg: Theme.dashBg,
             component: centralMode
+        },
+        {
+            name: "music",
+            active: Music.active,
+            width: Config.islandMusicWidth,
+            height: Config.islandMusicHeight,
+            bg: Theme.islandBg,
+            component: musicMode
         },
         {
             name: "clock",
@@ -205,6 +214,70 @@ Item {
     Component {
         id: centralMode
         CentralView { anchors.fill: parent }
+    }
+
+    // Faixa de música: relógio à esquerda, "Título — Artista" no meio
+    // (com reticências quando não cabe) e o equalizador à direita.
+    // Read-only: nenhum controle de playback, como pedido.
+    Component {
+        id: musicMode
+        Item {
+            anchors.fill: parent
+
+            QtObject {
+                id: musicClock
+
+                property string timeString: Qt.formatTime(new Date(), "HH:mm")
+                property int _lastMinute: -1
+
+                function updateTime() {
+                    const now = new Date()
+                    const currentMinute = now.getMinutes()
+
+                    if (currentMinute !== musicClock._lastMinute) {
+                        musicClock._lastMinute = currentMinute
+                        musicClock.timeString = Qt.formatTime(now, "HH:mm")
+                    }
+                }
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: 16
+                anchors.rightMargin: 14
+                spacing: 10
+
+                Text {
+                    text: musicClock.timeString
+                    color: Theme.islandText
+                    font.family: Theme.fontFamily
+                    font.bold: true
+                    font.pixelSize: Theme.fontSize + 3
+
+                    property Connections _heartbeat: Connections {
+                        target: Heartbeat
+                        function onTick1s() {
+                            musicClock.updateTime()
+                        }
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: Music.artist.length > 0 ? Music.title + " — " + Music.artist : Music.title
+                    color: Theme.islandText
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSize
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                Waveform {
+                    playing: Music.playing
+                }
+            }
+        }
     }
 
     Component {
