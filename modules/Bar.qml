@@ -69,6 +69,9 @@ PanelWindow {
             width: leftRow.implicitWidth + 24
             radius: height / 2
             color: Theme.islandBg
+            // Sem antialiasing os cantos arredondados ficam serrilhados e
+            // o wallpaper aparece "furando" a borda da pílula.
+            antialiasing: true
 
             RowLayout {
                 id: leftRow
@@ -90,6 +93,9 @@ PanelWindow {
             width: rightRow.implicitWidth + 24
             radius: height / 2
             color: Theme.islandBg
+            // Sem antialiasing os cantos arredondados ficam serrilhados e
+            // o wallpaper aparece "furando" a borda da pílula.
+            antialiasing: true
 
             RowLayout {
                 id: rightRow
