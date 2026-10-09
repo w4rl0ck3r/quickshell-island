@@ -60,12 +60,17 @@ PanelWindow {
         color: "transparent"
 
         // Duas pílulas laterais com a mesma cor da ilha.
+        // Ancoradas no topo (e não mais centradas) para abrir um respiro
+        // entre a pílula e a borda superior da tela. O offset é o maior
+        // que cabe: 4 + (barHeight - 4) = barHeight, ou seja a pílula
+        // continua 100% dentro da faixa clicável do `mask`.
         Rectangle {
             id: leftPill
             anchors.left: parent.left
             anchors.leftMargin: Config.margin
-            anchors.verticalCenter: parent.verticalCenter
-            height: Config.barHeight
+            anchors.top: parent.top
+            anchors.topMargin: 4
+            height: Config.barHeight - 4
             width: leftRow.implicitWidth + 24
             radius: height / 2
             color: Theme.islandBg
@@ -88,8 +93,9 @@ PanelWindow {
             id: rightPill
             anchors.right: parent.right
             anchors.rightMargin: Config.margin
-            anchors.verticalCenter: parent.verticalCenter
-            height: Config.barHeight
+            anchors.top: parent.top
+            anchors.topMargin: 4
+            height: Config.barHeight - 4
             width: rightRow.implicitWidth + 24
             radius: height / 2
             color: Theme.islandBg
