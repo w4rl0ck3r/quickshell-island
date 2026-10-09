@@ -69,7 +69,7 @@ PanelWindow {
             anchors.left: parent.left
             anchors.leftMargin: Config.margin
             anchors.top: parent.top
-            anchors.topMargin: 4
+            anchors.topMargin: 5
             height: Config.barHeight - 4
             width: leftRow.implicitWidth + 24
             radius: height / 2
@@ -94,7 +94,7 @@ PanelWindow {
             anchors.right: parent.right
             anchors.rightMargin: Config.margin
             anchors.top: parent.top
-            anchors.topMargin: 4
+            anchors.topMargin: 5
             height: Config.barHeight - 4
             width: rightRow.implicitWidth + 24
             radius: height / 2
