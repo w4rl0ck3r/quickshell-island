@@ -97,11 +97,40 @@ QtObject {
 
     // ---- saída (spotify_player sempre no topo) ----------------------
 
-    readonly property bool active: root.spHas
+    readonly property bool _hasTrack: root.spHas
         || (root.mprisCurrent !== null && root.mprisCurrent.trackTitle.length > 0)
-    readonly property bool playing: root.spHas
+    readonly property bool _rawPlaying: root.spHas
         ? root.spPlaying
         : (root.mprisCurrent !== null && root.mprisCurrent.isPlaying)
+
+    // Regra dos 10s: pausou, a pílula congela (barras retas) e some após
+    // 10s parado, voltando ao relógio. Tocou de novo (ou trocou de faixa)
+    // antes disso, o contador zera. Sem Timer próprio: tick1s do Heartbeat.
+    property int _pausedSecs: 0
+    property string _lastKey: ""
+    readonly property string _trackKey: root.title + "\n" + root.artist
+
+    property Connections _pauseWatch: Connections {
+        target: Heartbeat
+        function onTick1s() {
+            if (!root._hasTrack) {
+                root._pausedSecs = 0
+                root._lastKey = ""
+                return
+            }
+            const key = root._trackKey
+            if (root._rawPlaying || key !== root._lastKey) {
+                root._pausedSecs = 0
+                root._lastKey = key
+            } else if (root._pausedSecs < 10) {
+                root._pausedSecs++
+            }
+        }
+    }
+
+    readonly property bool active: root._hasTrack
+        && (root._rawPlaying || root._pausedSecs < 10)
+    readonly property bool playing: root._rawPlaying
     readonly property string title: root.spHas
         ? root.spTitle
         : (root.mprisCurrent !== null ? root.mprisCurrent.trackTitle : "")

@@ -40,7 +40,8 @@ quickshell/
 ├── shortcuts/
 │   └── Shortcuts.qml          # GlobalShortcut (desativado por padrão)
 ├── scripts/
-│   └── set-charge-mode.sh     # AJUSTE para o seu hardware (ver abaixo)
+│   ├── set-charge-mode.sh     # AJUSTE para o seu hardware (ver abaixo)
+│   └── cava.conf              # 5 bandas mono pro equalizador da ilha
 ├── modules/
 │   └── Bar.qml                # PanelWindow principal
 └── rofi/
@@ -78,13 +79,15 @@ linha de previews: digite para filtrar, use ←/→ para navegar, Enter
 aplica e Esc fecha. O wallpaper é aplicado via `hyprctl hyprpaper`
 (modo cover), sem editar arquivo de config.
 
-O modo **music** (`services/Music.qml`, MPRIS) aparece enquanto houver
-faixa carregada — tocar ou pausado. Layout: relógio à esquerda,
-`Título — Artista` ao centro (com reticências) e um equalizador de 5
-pílulas à direita que anima só enquanto `Music.playing` é verdadeiro;
-pausado, as barras ficam retas no mínimo (`-----`). Sem controles de
-playback e sem `Timer`: um único `NumberAnimation` dentro de
-`island/Waveform.qml` alimenta a onda e é destruído junto com o modo.
+O modo **music** (`services/Music.qml`: MPRIS + `spotify_player get key
+playback`, que sempre vence) aparece com faixa carregada. Layout:
+relógio à esquerda, `Título — Artista` ao centro (com reticências) e um
+equalizador de 5 pílulas à direita movido pelo áudio real
+(`services/Cava.qml`: processo `cava` com `scripts/cava.conf`, vivo só
+durante o playback; curva de loudness 0.55 + 70ms de suavização).
+Pausou, as barras congelam retas no mínimo (`-----`) e a pílula some
+após 10s parado, voltando ao relógio — sem `Timer` próprio, o contador
+usa o tick1s do Heartbeat. Sem controles de playback.
 
 **Atalho de exemplo (hyprland binds):**
 ```
@@ -107,6 +110,7 @@ essa modo está aberto (para o campo de busca receber teclas).
 - `power-profiles-daemon` (fornece `powerprofilesctl`)
 - `hyprlock` (ou troque `Config.lockCommand` pelo seu bloqueador)
 - `curl` (clima — `services/Weather.qml` via open-meteo)
+- `cava` (equalizador da ilha — `services/Cava.qml` + `scripts/cava.conf`)
 - `libnotify` (`notify-send` — alertas de bateria)
 - Fonte com emoji (ex: `noto-fonts-emoji`), Nerd Font para ícones dos
   widgets e a fonte `Inter` (ou troque `Theme.fontFamily`)

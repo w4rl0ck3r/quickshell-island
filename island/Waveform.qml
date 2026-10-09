@@ -1,17 +1,17 @@
 import QtQuick
 import "../config"
+import "../services"
 
-// Equalizador minimalista da ilha: 5 pílulas verticais que sobem e descem
-// enquanto a música toca. Sem Timer — um único NumberAnimation alimenta a
-// fase `t` e cada barra calcula a própria altura com um offset, formando a
-// onda que atravessa o equalizador.
+// Equalizador da ilha: 5 pílulas verticais movidas pelo áudio real
+// (services/Cava.qml). Sem Timer e sem onda fake — cada frame do cava
+// troca `Cava.levels` (0..1) e a altura segue com curva de loudness
+// (0.55, o cava entrega amplitude linear) + 70ms de suavização.
 //
-// Parado (faixa carregada, sem playback) as barras ficam retas no mínimo,
-// formando uma linha fina "-----" no centro da pílula.
+// Sem playback as barras ficam retas no mínimo ("-----").
 Item {
     id: root
 
-    // true = animando; false = barras achatadas no mínimo
+    // false = achata tudo no mínimo (pausa, grace de 10s, sem faixa)
     property bool playing: false
 
     readonly property int barWidth: 4
@@ -19,19 +19,10 @@ Item {
     readonly property int minH: 2     // reta: só o diâmetro da pílula
     readonly property int maxH: 18
     readonly property int count: 5
+    readonly property real curve: 0.55
 
     implicitWidth: row.implicitWidth
     implicitHeight: maxH
-
-    // Fase compartilhada 0..1; cada barra soma seu próprio offset.
-    property real t: 0
-    NumberAnimation on t {
-        from: 0
-        to: 1
-        duration: 1400
-        loops: Animation.Infinite
-        running: root.playing
-    }
 
     Row {
         id: row
@@ -53,10 +44,15 @@ Item {
                 Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     width: root.barWidth
-                    height: root.playing
-                        ? root.minH + (root.maxH - root.minH)
-                          * (0.5 + 0.5 * Math.sin(2 * Math.PI * (root.t + slot.i * 0.18)))
-                        : root.minH
+                    height: {
+                        if (!root.playing) return root.minH
+                        const v = Cava.levels[slot.i] ?? 0
+                        return root.minH + (root.maxH - root.minH)
+                            * Math.pow(Math.max(0, v), root.curve)
+                    }
+                    // Curta o bastante pra seguir a batida, longa o
+                    // bastante pra esconder um frame perdido do cava.
+                    Behavior on height { NumberAnimation { duration: 70; easing.type: Easing.OutQuad } }
                     radius: width / 2          // pílula, não quadrado
                     color: Theme.islandText
                 }
