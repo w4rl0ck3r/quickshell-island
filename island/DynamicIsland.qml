@@ -35,7 +35,7 @@ Item {
     // ilha ganha overshoot natural e assenta sem "cortar" no final.
     // spring  = força da mola (maior = mais rápido)
     // damping = amortecimento (menor = mais elástico / mais overshoot)
-    Behavior on scale { SpringAnimation { spring: 6; damping: 0.4 } }
+    Behavior on scale { SpringAnimation { spring: 15; damping: 0.4 } }
 
     readonly property var modes: [
         {
