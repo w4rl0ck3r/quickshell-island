@@ -65,7 +65,7 @@ Item {
         {
             name: "music",
             active: Music.active,
-            width: Config.islandMusicWidth,
+            width: root.musicWidth,
             height: Config.islandMusicHeight,
             bg: Theme.islandBg,
             component: musicMode
@@ -81,6 +81,29 @@ Item {
     ]
 
     readonly property var mode: modes.find(m => m.active)
+
+    // Medidas do conteúdo do modo música (mesmas fontes dos Texts do
+    // musicMode): a largura da ilha acompanha o título, presa entre
+    // islandMusicMinWidth e islandMusicMaxWidth. O relógio é medido com
+    // "00:00" — dígitos variam 1–2px entre horários, absorvidos no clamp;
+    // 32 = largura do Waveform (5 barras de 4px + 4 gaps de 3px).
+    TextMetrics {
+        id: musicTitleMetrics
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontSize
+        text: Music.artist.length > 0 ? Music.title + " — " + Music.artist : Music.title
+    }
+    TextMetrics {
+        id: musicClockMetrics
+        font.family: Theme.fontFamily
+        font.bold: true
+        font.pixelSize: Theme.fontSize + 3
+        text: "00:00"
+    }
+    readonly property int musicWidth: Math.max(Config.islandMusicMinWidth,
+        Math.min(Config.islandMusicMaxWidth,
+            16 + Math.ceil(musicClockMetrics.advanceWidth) + 10
+            + Math.ceil(musicTitleMetrics.advanceWidth) + 10 + 32 + 14))
 
     Rectangle {
         id: bg

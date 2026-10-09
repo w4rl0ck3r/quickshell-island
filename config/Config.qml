@@ -17,8 +17,9 @@ QtObject {
     readonly property int islandCentralWidth: 520
     readonly property int islandCentralHeight: 470
 
-    // Modo música (services/Music.qml + island/Waveform.qml)
-    readonly property int islandMusicWidth: 350
+    // Modo música: largura acompanha o título, presa entre min e max
+    readonly property int islandMusicMinWidth: 150
+    readonly property int islandMusicMaxWidth: 350
     readonly property int islandMusicHeight: 30
 
     
