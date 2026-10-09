@@ -77,7 +77,7 @@ Rectangle {
                         id: tooltipText
                         anchors.centerIn: parent
                         text: modelData.tooltipTitle.length > 0 ? modelData.tooltipTitle : modelData.title
-                        color: Theme.text
+                        color: Theme.dashText
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSize - 2
                     }
@@ -86,3 +86,4 @@ Rectangle {
         }
     }
 }
+

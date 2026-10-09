@@ -63,7 +63,7 @@ QtObject {
         if (charging)    return Theme.ok
         if (level <= 15) return Theme.alert
         if (level <= 30) return Theme.warning
-        return Theme.text
+        return Theme.islandText
     }
     readonly property var icon: {
         if (charging) {

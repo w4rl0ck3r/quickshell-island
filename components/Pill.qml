@@ -8,7 +8,7 @@ Rectangle {
     id: root
     property string icon: ""
     property string label: ""
-    property var contentColor: Theme.text
+    property var contentColor: Theme.islandText
     property bool showLabel: true
     property bool isClickable: false
     signal clicked()

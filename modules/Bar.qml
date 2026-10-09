@@ -59,26 +59,47 @@ PanelWindow {
         height: Config.barHeight
         color: "transparent"
 
-        RowLayout {
+        // Duas pílulas laterais com a mesma cor da ilha.
+        Rectangle {
+            id: leftPill
             anchors.left: parent.left
             anchors.leftMargin: Config.margin
             anchors.verticalCenter: parent.verticalCenter
-            spacing: Config.spacing
+            height: Config.barHeight
+            width: leftRow.implicitWidth + 24
+            radius: height / 2
+            color: Theme.islandBg
 
-            WorkspacesWidget {}
-            TemperatureWidget {}
-            ScreenTimeWidget {}
+            RowLayout {
+                id: leftRow
+                anchors.centerIn: parent
+                spacing: Config.spacing
+
+                WorkspacesWidget {}
+                TemperatureWidget {}
+                ScreenTimeWidget {}
+            }
         }
 
-        RowLayout {
+        Rectangle {
+            id: rightPill
             anchors.right: parent.right
             anchors.rightMargin: Config.margin
             anchors.verticalCenter: parent.verticalCenter
-            spacing: Config.spacing
-            
-            TrayWidget {}
-            WifiWidget {}
-            BatteryWidget {}
+            height: Config.barHeight
+            width: rightRow.implicitWidth + 24
+            radius: height / 2
+            color: Theme.islandBg
+
+            RowLayout {
+                id: rightRow
+                anchors.centerIn: parent
+                spacing: Config.spacing
+
+                TrayWidget {}
+                WifiWidget {}
+                BatteryWidget {}
+            }
         }
     }
 

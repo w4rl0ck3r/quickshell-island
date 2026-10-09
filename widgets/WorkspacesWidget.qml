@@ -19,7 +19,7 @@ RowLayout {
             implicitWidth: ws.focused ? 16 : 6
             implicitHeight: 6
             radius: 3
-            color: ws.focused ? Theme.text : Theme.subtle
+            color: ws.focused ? Theme.islandText : Theme.islandSubtle
             opacity: mouse.containsMouse ? 1.0 : 0.8
             Layout.alignment: Qt.AlignVCenter
 

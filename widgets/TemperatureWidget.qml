@@ -18,8 +18,8 @@ Pill {
 
     readonly property color statusColor: {
         if (celsius <= 30) return Theme.cool
-        if (celsius <= 69) return Theme.text
-        if (celsius <= 79) return Theme.warn
+        if (celsius <= 69) return Theme.islandText
+        if (celsius <= 79) return Theme.warning
 
         return Theme.alert
     }
