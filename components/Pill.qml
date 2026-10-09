@@ -25,19 +25,28 @@ Rectangle {
         spacing: 4
 
         Text {
+            id: iconText
             text: root.icon
             color: contentColor
             font.pixelSize: Theme.fontSize + 2
             font.weight: mouseArea.containsMouse ? Font.Bold : Font.Normal
+            // Caixa do ícone presa à altura do rótulo e centralizada:
+            // glifos de outra fonte (ex. o emoji ⏱) têm métricas de
+            // baseline diferentes e subiam para o topo da pílula.
+            Layout.alignment: Qt.AlignVCenter
+            Layout.preferredHeight: labelText.implicitHeight
+            verticalAlignment: Text.AlignVCenter
         }
 
         Text {
+            id: labelText
             text: root.label
             visible: root.showLabel && root.label.length > 0
             color: contentColor
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSize
             font.weight: mouseArea.containsMouse ? Font.Bold : Font.Normal
+            Layout.alignment: Qt.AlignVCenter
         }
     }
     

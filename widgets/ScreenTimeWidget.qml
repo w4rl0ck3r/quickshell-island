@@ -2,6 +2,6 @@ import "../components"
 import "../services"
 
 Pill {
-    icon: "⏱"
+    icon: ""
     label: ScreenTime.formatted
 }

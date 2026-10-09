@@ -7,7 +7,11 @@ import "../services"
 // sem ocupar espaço) quando não há nenhum ícone publicado.
 Rectangle {
     id: root
-    visible: Tray.items.value.lenght > 0
+    // SystemTray.items é um ObjectModel: a lista viva está em `.values`.
+    // (O binding antigo usava `value.lenght` — propriedade errada + typo —
+    // que quebrava a avaliação e deixava a bandeja sempre visível,
+    // ocupando ~12px vazios na pílula mesmo sem nenhum ícone.)
+    visible: Tray.items.values.length > 0
     implicitHeight: Config.pillHeight
     implicitWidth: visible ? row.implicitWidth + 12 : 0
     radius: Theme.radiusSmall
