@@ -76,47 +76,77 @@ Item {
             currentIndex: Wallpapers.sel
             onCurrentIndexChanged: positionViewAtIndex(Wallpapers.sel, ListView.Center)
 
+            // Respiro nas pontas: o frame ativo (190px + escala 1.05)
+            // transborda ~8px do slot — sem isso a borda externa do
+            // primeiro/último thumb nasceria cortada pelo clip.
+            header: Item { width: 10; height: 1 }
+            footer: Item { width: 10; height: 1 }
+
             // O deslize programa desliza com mola em vez de pular.
             Behavior on contentX { SpringAnimation { spring: 10; damping: 0.6 } }
 
             delegate: Item {
                 id: slot
                 property int i: index
+                readonly property bool isSel: Wallpapers.sel === slot.i
 
                 width: 184
                 height: thumbs.height
                 // O thumb ativo cresce e passaria POR BAIXO do vizinho
-                // (pintado depois): z alto mantém a borda visível.
-                z: Wallpapers.sel === slot.i ? 10 : 0
+                // (pintado depois): z alto mantém a moldura visível.
+                z: slot.isSel ? 10 : 0
 
                 ColumnLayout {
                     anchors.centerIn: parent
                     spacing: 6
 
-                    Rectangle {
-                        id: thumb
-                        Layout.preferredWidth: 184
-                        Layout.preferredHeight: 104
-                        radius: 12
-                        color: Theme.dashCard
-                        border.width: Wallpapers.sel === slot.i ? 3 : 0
-                        border.color: Theme.dashAccent
-                        clip: true
-                        scale: Wallpapers.sel === slot.i ? 1.05 : 1.0
-                        opacity: (Wallpapers.shown.length === 0 || Wallpapers.sel === slot.i) ? 1.0 : 0.6
+                    // Moldura em duas peças: anel do destaque ATRÁS e foto
+                    // NA FRENTE, como irmãos — a foto (sempre 3px menor em
+                    // cada lado) nunca cobre o anel, por construção. Não
+                    // usa `border.width`: com foto colada na borda, a ordem
+                    // de pintura deixava o anel atrás da imagem.
+                    Item {
+                        id: frame
+                        Layout.preferredWidth: 190
+                        Layout.preferredHeight: 110
+                        scale: slot.isSel ? 1.05 : 1.0
+                        opacity: (Wallpapers.shown.length === 0 || slot.isSel) ? 1.0 : 0.6
 
                         Behavior on scale { SpringAnimation { spring: 10; damping: 0.55 } }
                         Behavior on opacity { NumberAnimation { duration: Theme.animFast } }
 
-                        Image {
+                        Rectangle {
                             anchors.fill: parent
-                            anchors.margins: 3
-                            source: "file://" + Config.wallpapersDir + "/" + modelData
-                            fillMode: Image.PreserveAspectCrop
-                            sourceSize: Qt.size(368, 208)
-                            asynchronous: true
-                            smooth: true
-                            cache: true
+                            radius: 15
+                            color: slot.isSel ? Theme.dashAccent : "transparent"
+                        }
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: 184
+                            height: 104
+                            radius: 12
+                            color: Theme.dashCard
+                            clip: true
+
+                            // Folga de 5px entre foto e borda do card: `clip`
+                            // recorta filhos no BOUNDING RECT, não no formato
+                            // arredondado — colada na borda, os cantos retos
+                            // da foto cobriam o arco do anel nas quinas (e
+                            // saíam pra fora dele). Com a folga, o canto reto
+                            // fica DENTRO do arco do card (mínimo ≈ 3.5px
+                            // para radius 12), então o anel volta a contornar
+                            // as 4 quinas sem depender do clip.
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                source: "file://" + Config.wallpapersDir + "/" + modelData
+                                fillMode: Image.PreserveAspectCrop
+                                sourceSize: Qt.size(368, 208)
+                                asynchronous: true
+                                smooth: true
+                                cache: true
+                            }
                         }
 
                         MouseArea {
@@ -134,7 +164,7 @@ Item {
                         Layout.preferredWidth: 184
                         Layout.alignment: Qt.AlignHCenter
                         text: modelData
-                        color: Wallpapers.sel === slot.i ? Theme.dashText : Theme.dashSubtext
+                        color: slot.isSel ? Theme.dashText : Theme.dashSubtext
                         font.family: Theme.fontFamily
                         font.pixelSize: Theme.fontSize - 2
                         elide: Text.ElideMiddle

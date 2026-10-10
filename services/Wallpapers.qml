@@ -1,6 +1,5 @@
 pragma Singleton
 import QtQuick
-import Quickshell
 import Quickshell.Io
 import "../config"
 import "../menus"
@@ -60,6 +59,18 @@ QtObject {
 
     property Process errProc: Process { command: ["true"] }
 
+    // Entrada/saída do submap `wallpaper` (ver binds.lua) via Process
+    // rastreado: um execDetached silencioso já nos deixou presos com o
+    // submap armado uma vez — falha aqui aparece no log do quickshell.
+    property Process submapEnterProc: Process {
+        command: ["hyprctl", "dispatch", "hl.dsp.submap(\"wallpaper\")"]
+        onExited: code => { if (code !== 0) console.warn("Wallpapers: entrar no submap falhou (" + code + ")") }
+    }
+    property Process submapExitProc: Process {
+        command: ["hyprctl", "dispatch", "hl.dsp.submap(\"reset\")"]
+        onExited: code => { if (code !== 0) console.warn("Wallpapers: sair do submap falhou (" + code + ")") }
+    }
+
     function open() {
         root.filter = ""
         root.files = []
@@ -68,16 +79,17 @@ QtObject {
         ChargeModeMenu.close()
         PowerProfileMenu.close()
         PowerMenu.close()
-        // Entra no submap das teclas do picker (sai no close()).
-        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.submap(\"wallpaper\")"])
+        // Entra no submap das teclas Return/Esc (sai no close()).
+        // (As setas são binds estáticos non_consuming: sempre passam.)
+        if (!root.submapEnterProc.running) root.submapEnterProc.running = true
         listProc.running = true
     }
 
     function close() {
         root.active = false
         root.filter = ""
-        // Devolve as setas/Enter/Esc pros apps.
-        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.submap(\"reset\")"])
+        // Devolve Return/Esc pros apps.
+        if (!root.submapExitProc.running) root.submapExitProc.running = true
     }
 
     function nudge(d) {
