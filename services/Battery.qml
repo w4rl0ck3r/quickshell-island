@@ -59,10 +59,16 @@ QtObject {
         return match ? match[1] : "Standard"
     }
 
+    // Cores semânticas FIXAS (hex direto, fora do Theme): o matugen
+    // nunca as altera — aviso ≤30%, crítico ≤15%, carregando = ok.
+    readonly property color battOk: "#a6e3a1"
+    readonly property color battWarn: "#f9e2af"
+    readonly property color battAlert: "#f38ba8"
+
     readonly property color statusColor: {
-        if (charging)    return Theme.ok
-        if (level <= 15) return Theme.alert
-        if (level <= 30) return Theme.warning
+        if (charging)    return battOk
+        if (level <= 15) return battAlert
+        if (level <= 30) return battWarn
         return Theme.islandText
     }
     readonly property var icon: {
