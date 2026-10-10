@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell.Io
 import "../config"
+import "../services"
 
 // Menu de modo de carregamento da bateria (fast/standard/long_life).
 // O visual vive em island/ChargeMenuView.qml, como um modo da ilha
@@ -30,6 +31,7 @@ QtObject {
         if (!root.open) {
             PowerProfileMenu.close()
             PowerMenu.close()
+            Wallpapers.close()
         }
         root.open = !root.open
     }

@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import "../config"
 import "../menus"
@@ -8,7 +9,12 @@ import "../menus"
 // Lista arquivos de Config.wallpapersDir (1x por open), filtra por
 // `filter` e aplica via hyprpaper (hyprctl hyprpaper wallpaper).
 // A seleção (`sel`) vive aqui — não na view — para que os atalhos
-// globais (Shortcuts.qml) naveguem mesmo sem foco na janela.
+// alcancem sem foco na view.
+//
+// Teclado: as setas/Enter/Esc moram no submap `wallpaper` do Hyprland
+// (binds.lua) — binds estáticos de teclas peladas comeriam as teclas
+// no sistema todo. O picker entra no submap ao abrir e sai ao fechar,
+// então fora dele as teclas passam normalmente pros apps.
 QtObject {
     id: root
 
@@ -62,12 +68,16 @@ QtObject {
         ChargeModeMenu.close()
         PowerProfileMenu.close()
         PowerMenu.close()
+        // Entra no submap das teclas do picker (sai no close()).
+        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.submap(\"wallpaper\")"])
         listProc.running = true
     }
 
     function close() {
         root.active = false
         root.filter = ""
+        // Devolve as setas/Enter/Esc pros apps.
+        Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.submap(\"reset\")"])
     }
 
     function nudge(d) {

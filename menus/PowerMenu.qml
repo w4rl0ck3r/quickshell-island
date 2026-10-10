@@ -3,6 +3,7 @@ import QtQuick
 import Quickshell.Io
 import "../config"
 import "../services"
+import "../services"
 
 // Menu do sistema: trancar a sessão ou desligar.
 // O visual vive em island/PowerMenuView.qml, como um modo da ilha
@@ -29,6 +30,7 @@ QtObject {
         if (!root.open) {
             ChargeModeMenu.close()
             PowerProfileMenu.close()
+            Wallpapers.close()
         }
         root.open = !root.open
     }

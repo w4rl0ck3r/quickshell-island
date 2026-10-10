@@ -10,6 +10,9 @@ import "../menus"
 Item {
     id: root
 
+    // Esc local (a barra tem foco: o menu sempre abre por clique).
+    Shortcut { sequence: "Escape"; onActivated: PowerProfileMenu.close() }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16

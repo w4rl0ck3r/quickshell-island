@@ -9,6 +9,9 @@ import "../menus"
 Item {
     id: root
 
+    // Esc local (a barra tem foco: o menu sempre abre por clique).
+    Shortcut { sequence: "Escape"; onActivated: PowerMenu.close() }
+
     // Desligar: 1º clique arma ("Confirmar?"), 2º executa; desarma em 3s.
     property bool armed: false
     property int armTicks: 0

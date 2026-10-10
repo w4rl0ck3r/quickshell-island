@@ -93,9 +93,12 @@ os demais escurecem. O wallpaper é aplicado via `hyprctl hyprpaper`
 (modo cover), sem editar arquivo de config.
 
 Como a barra só tem foco de teclado com o mouse sobre ela
-(`follow_mouse`), as setas/Enter/Esc do picker são atalhos **globais**
-(`Shortcuts.qml`), registrados só enquanto ele está aberto — fora
-disso as teclas passam normalmente pros apps:
+(`follow_mouse`), as setas/Enter/Esc do picker moram no submap
+`wallpaper` do Hyprland (`hl.define_submap` em `binds.lua`): o picker
+entra nele ao abrir e sai ao fechar (`hyprctl dispatch ...`), então
+fora dele as teclas passam normalmente pros apps. Binds estáticos de
+teclas peladas foram tentados e revertidos — eles comem a tecla no
+sistema todo mesmo sem registro global ativo.
 
 O modo **music** (`services/Music.qml`: MPRIS + `spotify_player get key
 playback`, que sempre vence) aparece com faixa carregada. Layout:
@@ -157,16 +160,26 @@ declarado em `shortcuts/Shortcuts.qml`:
 
 ```
 bind = SUPER SHIFT, W, global, quickshell:wallpaper        # seletor de wallpaper
-bind = , left, global, quickshell:wallpaper-prev           # picker: anterior (só aberto)
-bind = , right, global, quickshell:wallpaper-next          # picker: próximo (só aberto)
-bind = , RETURN, global, quickshell:wallpaper-apply        # picker: aplicar (só aberto)
-bind = , ESCAPE, global, quickshell:island-escape          # fechar picker/menu
 ```
 
-Os quatro últimos vivem em `Loader`s com `active` ligado ao estado do
-picker/menu: o quickshell registra os nomes ao abrir e cancela ao
-fechar — com tudo fechado, setas/Enter/Esc passam normalmente pros
-apps. Rode `hyprctl reload` após editar os binds.
+Só o abridor é bind estático. As teclas do picker (`wallpaper-prev`,
+`wallpaper-next`, `wallpaper-apply`, `island-escape`) existem apenas
+dentro do submap `wallpaper`, definido em `binds.lua`:
+
+```lua
+hl.define_submap("wallpaper", function()
+    hl.bind("left", hl.dsp.global("quickshell:wallpaper-prev"))
+    hl.bind("right", hl.dsp.global("quickshell:wallpaper-next"))
+    hl.bind("RETURN", hl.dsp.global("quickshell:wallpaper-apply"))
+    hl.bind("ESCAPE", hl.dsp.global("quickshell:island-escape"))
+    hl.bind("ESCAPE", hl.dsp.submap("reset"))  -- sai mesmo sem quickshell
+end)
+```
+
+O serviço entra (`open()`) e sai (`close()`) do submap via
+`hyprctl dispatch 'hl.dsp.submap(...)'`. Os menus da ilha usam Esc
+local (`Shortcut` na view — o menu sempre abre por clique, e o clique
+foca a barra). Rode `hyprctl reload` após editar os binds.
 
 (`quickshell` é o `appid` padrão; troque se você definir outro.)
 

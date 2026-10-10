@@ -81,6 +81,7 @@ QtObject {
         if (!root.open) {
             ChargeModeMenu.close()
             PowerMenu.close()
+            Wallpapers.close()
             root.refresh()
         }
         root.open = !root.open
