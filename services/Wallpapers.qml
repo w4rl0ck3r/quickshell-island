@@ -2,10 +2,13 @@ pragma Singleton
 import QtQuick
 import Quickshell.Io
 import "../config"
+import "../menus"
 
 // Serviço do seletor de wallpapers na Dynamic Island.
 // Lista arquivos de Config.wallpapersDir (1x por open), filtra por
 // `filter` e aplica via hyprpaper (hyprctl hyprpaper wallpaper).
+// A seleção (`sel`) vive aqui — não na view — para que os atalhos
+// globais (Shortcuts.qml) naveguem mesmo sem foco na janela.
 QtObject {
     id: root
 
@@ -13,6 +16,8 @@ QtObject {
     property string filter: ""
     property var files: []
     property string lastError: ""
+
+    property int sel: 0
 
     // Suporta scroll com um texto vazio → mostra tudo.
     readonly property var shown: {
@@ -52,13 +57,26 @@ QtObject {
     function open() {
         root.filter = ""
         root.files = []
+        root.sel = 0
         root.active = true
+        ChargeModeMenu.close()
+        PowerProfileMenu.close()
+        PowerMenu.close()
         listProc.running = true
     }
 
     function close() {
         root.active = false
         root.filter = ""
+    }
+
+    function nudge(d) {
+        if (root.shown.length === 0) return
+        root.sel = Math.max(0, Math.min(root.shown.length - 1, root.sel + d))
+    }
+
+    function applySel() {
+        if (root.shown.length > 0) root.apply(root.shown[root.sel])
     }
 
     function apply(fileName) {

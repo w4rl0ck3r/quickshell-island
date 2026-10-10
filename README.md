@@ -31,10 +31,13 @@ quickshell/
 │   │                          #   stats, sliders de brilho/volume, ações
 │   ├── CalendarView.qml       # mini calendário do mês
 │   ├── NotificationView.qml   # notificação atual na ilha
+│   ├── ChargeMenuView.qml     # modo de carregamento (ilha, sem popup)
+│   ├── PowerProfileMenuView.qml # perfil de energia (ilha, sem popup)
+│   ├── PowerMenuView.qml      # trancar/desligar (ilha, sem popup)
 │   ├── Waveform.qml           # equalizador de 5 pílulas do modo música
 │   ├── ActionButton.qml  StatTile.qml
-├── menus/                     # cada um é um singleton com seu PopupWindow
-│   ├── ChargeModeMenu.qml
+├── menus/                     # singletons de estado/ação (o visual vive
+│   ├── ChargeModeMenu.qml     #   em island/, como modos da ilha)
 │   ├── PowerProfileMenu.qml
 │   └── PowerMenu.qml
 ├── shortcuts/
@@ -59,6 +62,9 @@ componentes são independentes, então adicionar/remover um item da barra
 ```qml
 readonly property var modes: [
     { name: "notification", active: Notifications.current !== null, ... },
+    { name: "charge",       active: ChargeModeMenu.open,           ... },
+    { name: "powerprofile", active: PowerProfileMenu.open,         ... },
+    { name: "power",        active: PowerMenu.open,                ... },
     { name: "central",      active: root.hovering,                ... },
     { name: "music",        active: Music.active,                 ... },
     { name: "clock",        active: true,                         ... },  // fallback
@@ -71,13 +77,25 @@ para que só a barra + ilha recebam clique.
 
 O modo **central** (hover) mostra: relógio grande, data por extenso,
 clima, calendário do mês, tiles de memória/CPU/tempo de tela/Bluetooth,
-sliders verticais de brilho e volume, botões de modo de carregamento e
-perfil de energia, e desligar com confirmação inline.
+sliders verticais de brilho e volume, e três ações que abrem os modos
+de menu da ilha — carregamento (`ChargeMenuView`), perfil de energia
+(`PowerProfileMenuView`) e sistema (`PowerMenuView`, trancar ou
+desligar com confirmação inline). Nada aqui é popup: os singletons em
+`menus/` guardam só estado e ações, e o visual mora em `island/` com
+as cores do resto do tema (linhas `dashCard`, ✓ em `dashAccent`).
+Esc fecha picker/menu aberto; abrir um fecha os outros.
 
 O modo **wallpaper** (atalho `quickshell:wallpaper`) mostra uma busca +
-linha de previews: digite para filtrar, use ←/→ para navegar, Enter
-aplica e Esc fecha. O wallpaper é aplicado via `hyprctl hyprpaper`
+filmstrip com o nome embaixo de cada preview: digite para filtrar,
+clique ou use ←/→ + Enter para aplicar, Esc fecha. A seleção desliza
+com mola até o centro, o thumb ativo cresce com borda `dashAccent` e
+os demais escurecem. O wallpaper é aplicado via `hyprctl hyprpaper`
 (modo cover), sem editar arquivo de config.
+
+Como a barra só tem foco de teclado com o mouse sobre ela
+(`follow_mouse`), as setas/Enter/Esc do picker são atalhos **globais**
+(`Shortcuts.qml`), registrados só enquanto ele está aberto — fora
+disso as teclas passam normalmente pros apps:
 
 O modo **music** (`services/Music.qml`: MPRIS + `spotify_player get key
 playback`, que sempre vence) aparece com faixa carregada. Layout:
@@ -135,13 +153,20 @@ exec-once = quickshell
 
 O Quickshell expõe os atalhos via `hyprland_global_shortcuts_v1`; quem
 define a combinação de teclas é o **Hyprland**, apontando para o nome
-declarado em `shortcuts/Shortcuts.qml`. Hoje só existe o atalho do
-seletor de wallpaper; adicione mais nomes em `Shortcuts.qml` se
-quiser outros:
+declarado em `shortcuts/Shortcuts.qml`:
 
 ```
-bind = SUPER SHIFT, W, global, quickshell:wallpaper   # seletor de wallpaper
+bind = SUPER SHIFT, W, global, quickshell:wallpaper        # seletor de wallpaper
+bind = , left, global, quickshell:wallpaper-prev           # picker: anterior (só aberto)
+bind = , right, global, quickshell:wallpaper-next          # picker: próximo (só aberto)
+bind = , RETURN, global, quickshell:wallpaper-apply        # picker: aplicar (só aberto)
+bind = , ESCAPE, global, quickshell:island-escape          # fechar picker/menu
 ```
+
+Os quatro últimos vivem em `Loader`s com `active` ligado ao estado do
+picker/menu: o quickshell registra os nomes ao abrir e cancela ao
+fechar — com tudo fechado, setas/Enter/Esc passam normalmente pros
+apps. Rode `hyprctl reload` após editar os binds.
 
 (`quickshell` é o `appid` padrão; troque se você definir outro.)
 
