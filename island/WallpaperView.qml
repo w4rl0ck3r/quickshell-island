@@ -85,6 +85,9 @@ Item {
 
                 width: 184
                 height: thumbs.height
+                // O thumb ativo cresce e passaria POR BAIXO do vizinho
+                // (pintado depois): z alto mantém a borda visível.
+                z: Wallpapers.sel === slot.i ? 10 : 0
 
                 ColumnLayout {
                     anchors.centerIn: parent
@@ -107,7 +110,7 @@ Item {
 
                         Image {
                             anchors.fill: parent
-                            anchors.margins: 2
+                            anchors.margins: 3
                             source: "file://" + Config.wallpapersDir + "/" + modelData
                             fillMode: Image.PreserveAspectCrop
                             sourceSize: Qt.size(368, 208)
