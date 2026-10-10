@@ -45,9 +45,6 @@ PanelWindow {
     // Conecta os menus (que vivem fora da árvore da barra, como
     // singletons) à janela desta barra para que possam se ancorar nela.
     Component.onCompleted: {
-        if (!ChargeModeMenu.barWindow) ChargeModeMenu.barWindow = bar
-        if (!PowerProfileMenu.barWindow) PowerProfileMenu.barWindow = bar
-        if (!PowerMenu.barWindow) PowerMenu.barWindow = bar
         if (!Tray.barWindow) Tray.barWindow = bar
     }
 

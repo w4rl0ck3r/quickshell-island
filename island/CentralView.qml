@@ -15,9 +15,6 @@ Item {
     property bool showMemoryGB: false
     property var now: new Date()
 
-    // Confirmação inline do desligamento: 1º clique arma, 2º executa.
-    property bool powerArmed: false
-
     readonly property var weekdays: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
     readonly property var months:   ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
 
@@ -46,12 +43,6 @@ Item {
         function onTick1s() { root.now = new Date() }
     }
 
-    Timer {
-        id: powerArmTimer
-        interval: 3000
-        onTriggered: root.powerArmed = false
-    }
-
     // Consulta o perfil de energia a cada 5s (powerprofilesctl get).
     Process {
         id: powerProfileProc
@@ -65,11 +56,6 @@ Item {
     property Connections _profileTick: Connections {
         target: Heartbeat
         function onTick5s() { powerProfileProc.running = true }
-    }
-
-    Process {
-        id: shutdownProc
-        command: ["sh", "-c", Config.shutdownCommand]
     }
 
     Process {
@@ -318,18 +304,9 @@ Item {
                 Layout.fillWidth: true
                 danger: true
                 icon: "⏻"
-                label: root.powerArmed ? "Confirmar?" : "Desligar"
-                caption: root.powerArmed ? "Toque de novo" : "Sistema"
-                onClicked: {
-                    if (root.powerArmed) {
-                        powerArmTimer.stop()
-                        root.powerArmed = false
-                        shutdownProc.running = true
-                    } else {
-                        root.powerArmed = true
-                        powerArmTimer.restart()
-                    }
-                }
+                label: "Desligar"
+                caption: "Sistema"
+                onClicked: PowerMenu.toggle()
             }
         }
     }

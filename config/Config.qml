@@ -17,6 +17,10 @@ QtObject {
     readonly property int islandCentralWidth: 520
     readonly property int islandCentralHeight: 470
 
+    // Modos de menu na ilha (charge/powerprofile/power)
+    readonly property int islandMenuWidth: 320
+    readonly property int islandMenuHeight: 224
+
     // Modo música: largura acompanha o título, presa entre min e max
     readonly property int islandMusicMinWidth: 150
     readonly property int islandMusicMaxWidth: 350

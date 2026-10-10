@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Shapes
 import "../config"
 import "../services"
+import "../menus"
 
 // Ilha dinâmica orientada a "modos"
 // Percebi que para ter vários modos com diferentes widgets preciso modificar o código para suportar 
@@ -47,10 +48,34 @@ Item {
             component: notificationMode
         },
         {
+            name: "charge",
+            active: ChargeModeMenu.open,
+            width: Config.islandMenuWidth,
+            height: Config.islandMenuHeight,
+            bg: Theme.dashBg,
+            component: chargeMode
+        },
+        {
+            name: "powerprofile",
+            active: PowerProfileMenu.open,
+            width: Config.islandMenuWidth,
+            height: Config.islandMenuHeight,
+            bg: Theme.dashBg,
+            component: powerProfileMode
+        },
+        {
+            name: "power",
+            active: PowerMenu.open,
+            width: Config.islandMenuWidth,
+            height: Config.islandMenuHeight,
+            bg: Theme.dashBg,
+            component: powerMode
+        },
+        {
             name: "wallpaper",
             active: Wallpapers.active,
             width: Config.islandCentralWidth,
-            height: 300,
+            height: 230,
             bg: Theme.dashBg,
             component: wallpaperMode
         },
@@ -237,6 +262,21 @@ Item {
     Component {
         id: centralMode
         CentralView { anchors.fill: parent }
+    }
+
+    Component {
+        id: chargeMode
+        ChargeMenuView { anchors.fill: parent }
+    }
+
+    Component {
+        id: powerProfileMode
+        PowerProfileMenuView { anchors.fill: parent }
+    }
+
+    Component {
+        id: powerMode
+        PowerMenuView { anchors.fill: parent }
     }
 
     // Faixa de música: relógio à esquerda, "Título — Artista" no meio
