@@ -2,7 +2,7 @@ import "../components"
 import "../services"
 
 Pill {
-    property bool showSsid : false
+    property bool showSsid : true
 
     icon: Network.connected ? "" : "󰌙"
     label: showSsid 
