@@ -105,7 +105,13 @@ QtObject {
         const path = Config.wallpapersDir + "/" + fileName
         applyProc.command = ["sh", "-c",
             "hyprctl hyprpaper wallpaper '" + Config.wallpaperMonitor + "," + path + ",cover'" +
-            " && matugen image -m 'smart' --type scheme-vibrant --prefer saturation \"" + path + "\"" +
+            // Paleta via wallust (duas passadas: clara p/ barra, escura p/
+            // dash + hypr) fundidas com jq no Theme.json — ver wallust.toml.
+            " && mkdir -p \"$HOME/.cache/wallust\"" +
+            " && wallust run -C \"$HOME/.config/wallust/wallust.toml\" -s -q -n \"" + path + "\"" +
+            " && wallust run -C \"$HOME/.config/wallust/wallust-dark.toml\" -s -q -n \"" + path + "\"" +
+            " && jq -s '.[0] * .[1]' \"$HOME/.cache/wallust/bar.json\" \"$HOME/.cache/wallust/dash.json\"" +
+            " > \"$HOME/.config/quickshell/config/Theme.json\"" +
             " && hyprctl reload" +
             // Persiste: atualiza o path no hyprpaper.conf para o próximo boot
             " && sed -i 's|path = .*|path = " + path + "|' \"$HOME/.config/hypr/hyprpaper.conf\""

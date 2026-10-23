@@ -59,11 +59,12 @@ QtObject {
         return match ? match[1] : "Standard"
     }
 
-    // Cores semânticas FIXAS (hex direto, fora do Theme): o matugen
-    // nunca as altera — aviso ≤30%, crítico ≤15%, carregando = ok.
-    readonly property color battOk: "#a6e3a1"
-    readonly property color battWarn: "#f9e2af"
-    readonly property color battAlert: "#f38ba8"
+    // Cores semânticas da BARRA clara: tokens `island*` (joias profundas,
+    // contraste AA sobre `islandBg`). São fixos no template do wallust —
+    // ele nunca os altera. Aviso ≤30%, crítico ≤15%, carregando = ok.
+    readonly property color battOk: Theme.islandOk
+    readonly property color battWarn: Theme.islandWarning
+    readonly property color battAlert: Theme.islandAlert
 
     readonly property color statusColor: {
         if (charging)    return battOk

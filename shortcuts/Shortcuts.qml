@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell.Hyprland
+import "../config"
 import "../menus"
 import "../services"
 
@@ -34,6 +35,12 @@ Item {
         description: "Seletor de wallpaper: aplicar"
         onPressed: if (Wallpapers.active) Wallpapers.applySel()
     }
+    GlobalShortcut {
+        name: "theme-toggle"
+        description: "Alternar esquema claro/escuro da barra"
+        onPressed: Theme.toggle()
+    }
+
     GlobalShortcut {
         name: "island-escape"
         description: "Fechar picker/menu da Dynamic Island"

@@ -286,7 +286,9 @@ Item {
 
             ActionPill {
                 Layout.fillWidth: true
-                icon: "🔋"
+                icon: { if (root.chargeLabel === "Fast") return "󱐋"
+                        if (root.chargeLabel === "Longa duração") return "󰌪"
+                        else return "" }
                 label: root.chargeLabel
                 caption: "Carregamento"
                 onClicked: ChargeModeMenu.toggle()
@@ -294,7 +296,9 @@ Item {
 
             ActionPill {
                 Layout.fillWidth: true
-                icon: "⚡"
+                icon: { if (root.powerLabel === "Performance") return "󱐋"
+                        if (root.powerLabel === "Economia") return "󰌪"
+                        else return "" }
                 label: root.powerLabel
                 caption: "Energia"
                 onClicked: PowerProfileMenu.toggle()
@@ -372,6 +376,7 @@ Item {
 
             Text {
                 text: pill.icon
+                color: pill.danger ? Qt.rgba(0.66, 0.26, 0.20, 0.7) : Theme.dashSubtext
                 font.pixelSize: 18
             }
             ColumnLayout {

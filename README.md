@@ -119,6 +119,41 @@ bind = SUPER SHIFT, W, global, quickshell:wallpaper
 monitor usado pelo picker. `Bar.qml` só torna a janela focável enquanto
 essa modo está aberto (para o campo de busca receber teclas).
 
+## Paleta e contraste (duas superfícies)
+
+A barra vive sobre fundo **claro** (`islandBg`) e os modos de menu da
+ilha sobre fundo **escuro** (`dashBg`, ligado por modo em
+`DynamicIsland.qml`) — por isso os tokens semânticos são duplos. Os
+pastéis (`alert`, `ok`, `cool`, `warning`: ~10:1 no escuro, ~1.3:1 no
+claro) servem **só** ao dash (confirmação de desligar e afins). Na barra
+clara, widgets e bordas usam os tokens `island*` — joias profundas com
+≥4.5:1 sobre `islandBg`, **fixos** (não vêm do wallpaper):
+
+| token (barra) | cor | uso |
+|---|---|---|
+| `islandAlert` | `#B3261E` | borda crítica, temp ≥80° |
+| `islandOk` | `#386A1F` | bateria carregando |
+| `islandWarning` | `#7E5700` | bateria ≤30%, temp 70–79° |
+| `islandCool` | `#0F6B6E` | temp ≤30° |
+| `islandAccent` | `primary_container` | destaque que acompanha o wallpaper |
+
+`config/Theme.json` é gerado pelo wallust a cada troca de wallpaper
+(duas passadas fundidas com `jq`, ver `Wallpapers.apply()`) e está no
+`.gitignore` — a fonte duradoura são os templates em
+`~/.config/wallust/templates/` (onde os `island*` e os pastéis do dash
+já estão fixos, e o `islandAccent`/`dashAccent` acompanham o wallpaper).
+Os mesmos hexes vivem como fallback em `config/Colors.qml`.
+
+## Esquema claro/escuro
+
+Um esquema por vez, sem mistura: no claro, barra e painéis são creme
+(`island*` + `dash*` claros, com `islandCard` de elevação); no escuro,
+tudo é espresso. `Theme.dark` alterna as duas famílias de aliases, então
+nenhum widget precisa saber do modo atual. Alterne com
+`SUPER SHIFT + T` (`binds.lua` → `quickshell:theme-toggle`). A escolha
+persiste em `config/thememode` (fora do git) e aplica ao vivo, sem
+reiniciar o qs.
+
 ## Dependências
 
 - `quickshell` (git ou AUR) com suporte a Hyprland habilitado
@@ -160,6 +195,7 @@ declarado em `shortcuts/Shortcuts.qml`:
 
 ```
 bind = SUPER SHIFT, W, global, quickshell:wallpaper        # seletor de wallpaper
+bind = SUPER SHIFT, T, global, quickshell:theme-toggle    # alternar claro/escuro
 ```
 
 Só o abridor é bind estático. As teclas do picker (`wallpaper-prev`,

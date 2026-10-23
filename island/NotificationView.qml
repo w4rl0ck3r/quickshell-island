@@ -67,7 +67,8 @@ Item {
                 Rectangle {
                     visible: root.critical
                     width: 6; height: 6; radius: 3
-                    color: Theme.alert
+                    // Notificação mora na barra clara: ponto vermelho profundo.
+                    color: Theme.islandAlert
                 }
 
                 Text {

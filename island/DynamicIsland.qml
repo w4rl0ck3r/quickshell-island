@@ -44,7 +44,6 @@ Item {
             active: Notifications.current !== null,
             width: Config.islandNotifWidth,
             height: Config.islandNotifHeight,
-            bg: Theme.islandBg,
             component: notificationMode
         },
         {
@@ -52,7 +51,6 @@ Item {
             active: ChargeModeMenu.open,
             width: Config.islandMenuWidth,
             height: Config.islandMenuHeight,
-            bg: Theme.dashBg,
             component: chargeMode
         },
         {
@@ -60,7 +58,6 @@ Item {
             active: PowerProfileMenu.open,
             width: Config.islandMenuWidth,
             height: Config.islandMenuHeight,
-            bg: Theme.dashBg,
             component: powerProfileMode
         },
         {
@@ -68,7 +65,6 @@ Item {
             active: PowerMenu.open,
             width: Config.islandMenuWidth,
             height: Config.islandMenuHeight,
-            bg: Theme.dashBg,
             component: powerMode
         },
         {
@@ -76,7 +72,6 @@ Item {
             active: Wallpapers.active,
             width: Config.islandCentralWidth,
             height: 230,
-            bg: Theme.dashBg,
             component: wallpaperMode
         },
         {
@@ -84,7 +79,6 @@ Item {
             active: root.hovering,
             width: Config.islandCentralWidth,
             height: Config.islandCentralHeight,
-            bg: Theme.dashBg,
             component: centralMode
         },
         {
@@ -92,7 +86,6 @@ Item {
             active: Music.active,
             width: root.musicWidth,
             height: Config.islandMusicHeight,
-            bg: Theme.islandBg,
             component: musicMode
         },
         {
@@ -100,7 +93,6 @@ Item {
             active: true,
             width: Config.islandCollapsedWidth,
             height: Config.islandCollapsedHeight,
-            bg: Theme.islandBg,
             component: clockMode
         }
     ]
@@ -133,6 +125,8 @@ Item {
     Rectangle {
         id: bg
         radius: Math.min(height / 2, 28)
+        // Painel único por esquema (claro OU escuro, via Theme.dark):
+        // todos os modos herdam a mesma superfície, sem alternância.
         color: Theme.islandBg
         clip: true
         anchors.horizontalCenter: parent.horizontalCenter
@@ -148,11 +142,17 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             height: parent.height / 2
-            color: Theme.islandBg
+            // Segue o painel (não um token fixo): nos modos escuros esta
+            // faixa tem que escurecer junto, senão o topo do painel
+            // ficaria claro. Os cantos retos dela (clip é bounding rect)
+            // cobrem o arredondado do `bg` e deixam o topo quadrado pras asas.
+            color: bg.color
         }
 
         border.width: root.mode.name === "notification" && Notifications.critical ? 1 : 0
-        border.color: Theme.alert
+        // Borda sobre `islandBg` (claro): usa o vermelho profundo; o
+        // `alert` pastel some no fundo claro (1.3:1).
+        border.color: Theme.islandAlert
 
         Behavior on color  { ColorAnimation { duration: Theme.animNormal } }
         Behavior on width  { SpringAnimation { spring: 4; damping: 0.4 } }

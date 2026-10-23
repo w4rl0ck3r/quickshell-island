@@ -17,11 +17,11 @@ Pill {
     }
 
     readonly property color statusColor: {
-        if (celsius <= 30) return Theme.cool
+        if (celsius <= 30) return Theme.islandCool
         if (celsius <= 69) return Theme.islandText
-        if (celsius <= 79) return Theme.warning
+        if (celsius <= 79) return Theme.islandWarning
 
-        return Theme.alert
+        return Theme.islandAlert
     }
 
     icon: statIcon
